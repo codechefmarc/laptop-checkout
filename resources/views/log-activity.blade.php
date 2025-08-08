@@ -3,7 +3,12 @@
     Log Activity
   </x-slot:heading>
 
-(Log Activity form will go here...)
+  <x-log-activity-form />
+
+  <hr class="h-px my-8 bg-gray-300 border-0 dark:bg-gray-700">
+
+  <x-activity-list>
+    Today's Activity
+  </x-activity-list>
 
 </x-layout>
-

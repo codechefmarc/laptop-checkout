@@ -12,6 +12,7 @@ return new class extends Migration {
     Schema::create('statuses', function (Blueprint $table) {
       $table->id();
       $table->string('status_name');
+      $table->string('tailwind_class');
       $table->timestamps();
     });
   }

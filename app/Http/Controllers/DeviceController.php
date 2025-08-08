@@ -45,7 +45,7 @@ class DeviceController extends Controller
      */
     public function edit(Device $device)
     {
-        //
+        return view('device.edit', ['device' => $device]);
     }
 
     /**

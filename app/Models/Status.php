@@ -13,4 +13,5 @@ class Status extends Model {
   public function activityLogs() {
     return $this->hasMany(Activity::class);
   }
+
 }

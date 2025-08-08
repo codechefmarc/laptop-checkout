@@ -15,7 +15,7 @@ return new class extends Migration {
       $table->id();
       $table->foreignIdFor(Device::class);
       $table->foreignIdFor(Status::class);
-      $table->string('username');
+      $table->string('username')->nullable();
       $table->text('notes')->nullable();
       $table->timestamps();
     });

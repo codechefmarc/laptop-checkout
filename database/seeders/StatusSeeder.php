@@ -11,10 +11,20 @@ class StatusSeeder extends Seeder {
    * Run the database seeds.
    */
   public function run(): void {
-    $statuses = ['Library', 'Imaging', 'Surplus', 'Repair'];
+    $statuses = [
+      'Library' => 'bg-green-600',
+      'Imaging' => 'bg-yellow-600',
+      'Surplus' => 'bg-gray-600',
+      'Repair' => 'bg-blue-600',
+    ];
 
-    foreach ($statuses as $status) {
-      Status::firstOrCreate(['status_name' => $status]);
+    foreach ($statuses as $name => $class) {
+      Status::firstOrCreate(
+        [
+          'status_name' => $name,
+          'tailwind_class' => $class,
+        ]);
     }
   }
+
 }
