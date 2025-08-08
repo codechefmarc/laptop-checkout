@@ -7,10 +7,13 @@ use App\Http\Controllers\DeviceController;
 Route::controller(ActivityController::class)->group(function () {
   Route::get('/', 'logActivity');
   Route::post('/', 'store');
+  Route::patch('/{activity}', 'patch')->name('activities.patch');
+  Route::get('/edit/{activity}', 'edit');
+  Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
 });
 
 Route::controller(DeviceController::class)->group(function () {
-  Route::get('/device/{device}/edit', 'edit');
+  Route::delete('/device/delete/{device}', 'delete')->name('device.delete');
 });
 
 Route::view('/search', 'search');

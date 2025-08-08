@@ -13,7 +13,7 @@ return new class extends Migration {
   public function up(): void {
     Schema::create('activities', function (Blueprint $table) {
       $table->id();
-      $table->foreignIdFor(Device::class);
+      $table->foreignIdFor(Device::class, 'device_id')->constrained()->cascadeOnDelete();
       $table->foreignIdFor(Status::class);
       $table->string('username')->nullable();
       $table->text('notes')->nullable();

@@ -11,4 +11,6 @@
     Today's Activity
   </x-activity-list>
 
+  <x-device-modal />
+
 </x-layout>

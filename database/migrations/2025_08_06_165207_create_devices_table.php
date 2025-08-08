@@ -11,8 +11,8 @@ return new class extends Migration {
   public function up(): void {
     Schema::create('devices', function (Blueprint $table) {
       $table->id();
-      $table->string('srjc_tag')->nullable();
-      $table->string('serial_number')->nullable();
+      $table->string('srjc_tag')->nullable()->unique();
+      $table->string('serial_number')->nullable()->unique();
       $table->string('model_number')->nullable();
       $table->timestamps();
     });

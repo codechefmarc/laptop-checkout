@@ -3,5 +3,5 @@
     Search
   </x-slot:heading>
 
-  Hi from search
+  <x-search-form/>
 </x-layout>

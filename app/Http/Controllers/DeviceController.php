@@ -45,7 +45,7 @@ class DeviceController extends Controller
      */
     public function edit(Device $device)
     {
-        return view('device.edit', ['device' => $device]);
+        //
     }
 
     /**
@@ -63,4 +63,10 @@ class DeviceController extends Controller
     {
         //
     }
+
+  public function delete(Device $device) {
+    $device->delete();
+    return redirect('/')->with('success', 'Device and associated activities deleted.');
+  }
+
 }
