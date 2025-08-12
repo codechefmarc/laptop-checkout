@@ -13,7 +13,7 @@
         id="status_any"
         name="status_id"
         value="any"
-        checked
+        {{ request('status_id') === 'any' || !request('status_id') ? 'checked' : '' }}
       >
       <label for="status_any">Any</label>
   </div>
@@ -21,7 +21,11 @@
 
   @foreach ($statuses as $status)
   @php
-    $checked = ($selected == $status->id) ? 'checked' : FALSE;
+    if($search) {
+      $checked = (request('status_id') == $status->id) ? 'checked' : false;
+    } else {
+      $checked = ($selected == $status->id) ? 'checked' : false;
+    }
   @endphp
   <div>
 
@@ -31,7 +35,7 @@
       name="status_id"
       value="{{ $status->id }}"
       {{ !$search ? 'required' : '' }}
-      {{ $search ? '' : $checked }}
+      {{ $checked ? 'checked' : '' }}
       >
 
       <label for="status_{{ $status->id }}">{{ $status->status_name }}</label>

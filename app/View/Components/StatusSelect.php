@@ -14,6 +14,7 @@ class StatusSelect extends Component {
     $this->selected = $selected
       ?? old('status_id')
       ?? session('saved_status')
+      ?? request('status_id')
       ?? null;
   }
 

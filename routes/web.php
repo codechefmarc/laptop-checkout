@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\SearchController;
+use Illuminate\Support\Facades\Route;
 
 Route::controller(ActivityController::class)->group(function () {
   Route::get('/', 'logActivity');
@@ -16,5 +17,8 @@ Route::controller(DeviceController::class)->group(function () {
   Route::delete('/device/delete/{device}', 'delete')->name('device.delete');
 });
 
-Route::view('/search', 'search');
+Route::controller(SearchController::class)->group(function () {
+  Route::get('/search', 'search')->name('search');
+});
+
 Route::view('/reports', 'reports');

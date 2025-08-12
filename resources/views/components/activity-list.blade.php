@@ -1,3 +1,4 @@
+<hr class="h-px my-8 bg-gray-300 border-0 dark:bg-gray-700">
 <!-- Activity List Component -->
 <div class="bg-white shadow-lg rounded-lg overflow-hidden">
   <!-- Table Header -->
@@ -40,7 +41,7 @@
           <tr class="odd:bg-white even:bg-gray-50 hover:bg-gray-50 transition-colors duration-200">
 
           <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm text-gray-900">{{ $activity->created_at->format('d/m/Y') }}</div>
+            <div class="text-sm text-gray-900">{{ $activity->created_at->format('m/d/Y') }}</div>
             <div class="text-xs text-gray-500">{{ $activity->created_at->format('g:iA') }}</div>
           </td>
 
@@ -68,7 +69,7 @@
           </td>
         </tr>
           @empty
-        <tr><td colspan="5" class="text-center py-8">No activities found</td></tr>
+        <tr><td colspan="6" class="text-center py-8">No activities found</td></tr>
         @endforelse
 
 
