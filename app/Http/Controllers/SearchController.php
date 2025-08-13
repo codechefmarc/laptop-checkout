@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller {
   public function search(Request $request) {
-    // Check if this is a search submission (has any search parameters)
-    $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'device_id']); // add your search fields
+
+    $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'device_id', 'model_number']);
 
     $activities = null; // Default to null (no results to show)
 
@@ -25,6 +25,20 @@ class SearchController extends Controller {
       if ($request->filled('srjc_tag')) {
         $query->whereHas('device', function ($q) use ($request) {
           $q->where('srjc_tag', $request->srjc_tag);
+        });
+      }
+
+      // Handle Serial Number
+      if ($request->filled('serial_number')) {
+        $query->whereHas('device', function ($q) use ($request) {
+          $q->where('serial_number', $request->serial_number);
+        });
+      }
+
+      // Handle Model Number
+      if ($request->filled('model_number')) {
+        $query->whereHas('device', function ($q) use ($request) {
+          $q->where('model_number', 'LIKE', '%' . $request->model_number . '%');
         });
       }
 
@@ -66,9 +80,9 @@ class SearchController extends Controller {
       // Execute the query
       $activities = $query->latest('created_at')->paginate(20);
       $activities->appends($request->query());
-  }
+    }
 
-  return view('search', compact('activities'));
+    return view('search', compact('activities'));
   }
 
 }

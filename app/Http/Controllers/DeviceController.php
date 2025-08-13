@@ -43,18 +43,39 @@ class DeviceController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Device $device)
-    {
-        //
+    public function edit(Device $device) {
+      return view('device.edit', [
+        'device' => $device,
+      ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDeviceRequest $request, Device $device)
-    {
-        //
-    }
+    public function patch(Device $device, Request $request) {
+    // authorize (on hold)
+    // validate
+
+      dd("ho!!");
+
+    $validationRules = [
+      'srjc_tag' => ['required_without:serial_number'],
+      'serial_number' => ['required'],
+      'model_number' => ['required'],
+    ];
+
+    $validated = request()->validate($validationRules);
+
+    // Update the device
+    $device->update([
+      'srjc_tag' => $validated['srjc_tag'],
+      'serial_number' => $validated['serial_number'],
+      'model_number' => $validated['model_number'],
+    ]);
+
+    // Redirect to job specific page
+    return redirect('/')->with('success', 'Device and activity successfully updated.');
+  }
 
     /**
      * Remove the specified resource from storage.

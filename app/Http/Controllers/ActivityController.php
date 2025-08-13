@@ -89,9 +89,11 @@ class ActivityController extends Controller {
 
   public function edit(Activity $activity) {
     $statuses = Status::all();
+    $returnUrl = url()->previous();
     return view('activity.edit', [
       'activity' => $activity,
       'statuses' => $statuses,
+      'returnUrl' => $returnUrl,
     ]);
   }
 
@@ -100,35 +102,26 @@ class ActivityController extends Controller {
     // validate
 
     $validationRules = [
-      'srjc_tag' => ['required_without:serial_number'],
-      'serial_number' => ['required'],
       'status_id' => ['required'],
       'notes' => ['nullable'],
-      'model_number' => ['required'],
     ];
 
     $validated = request()->validate($validationRules);
-
     // Update the activity
     $activity->update([
       'status_id' => $validated['status_id'],
       'notes' => $validated['notes'],
     ]);
-    $device = $activity->device;
-    // Update the device
-    $device->update([
-      'srjc_tag' => $validated['srjc_tag'],
-      'serial_number' => $validated['serial_number'],
-      'model_number' => $validated['model_number'],
-    ]);
 
     // Redirect to job specific page
-    return redirect('/')->with('success', 'Device and activity successfully updated.');
+    $returnUrl = $request->get('return_url', '/');
+    return redirect($returnUrl)->with('success', 'Activity successfully updated.');
   }
 
-  public function delete(Activity $activity) {
+  public function delete(Activity $activity, Request $request) {
     $activity->delete();
-    return redirect('/')->with('success', 'Activity deleted.');
+    $returnUrl = $request->get('return_url', '/');
+    return redirect($returnUrl)->with('success', 'Activity deleted.');
   }
 
 }

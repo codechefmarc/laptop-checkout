@@ -27,7 +27,7 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Notes
           </th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+          <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
             Operations
           </th>
         </tr>
@@ -64,7 +64,12 @@
           </td>
           <td class="px-6 py-4">
             <div class="text-sm text-gray-900">
-              <a class="text-blue-500 font-semibold hover:text-gray-800" href="/edit/{{ $activity->id }}">Edit</a>
+              <a class="text-blue-500 font-semibold hover:text-gray-800" href="/activity/edit/{{ $activity->id }}">Edit Activity</a>
+            </div>
+          </td>
+          <td>
+            <div class="text-sm text-gray-900">
+              <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $activity->device->id }}">Edit Device</a>
             </div>
           </td>
         </tr>
