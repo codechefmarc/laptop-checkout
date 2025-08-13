@@ -6,6 +6,8 @@
 <form method="POST" action="{{ route('devices.patch', $device->id) }}">
   @csrf
   @method('PATCH')
+
+  <input type="hidden" name="return_url" value="{{ $returnUrl }}">
   <div class="max-w-2xl border-b border-gray-900/10 mx-auto bg-white p-8 rounded-lg shadow-md">
     <div class="pb-12">
       <div class="mt-10 flex flex-col gap-y-2">
@@ -72,7 +74,11 @@
     </div>
     <div class="flex flex-col gap-3">
       <div class="flex-col items-center">
-        <button form="delete-device-form" class="block text-red-500 font-bold cursor-pointer">Delete Device</button>
+        <button
+          form="delete-device-form"
+          class="block text-red-500 font-bold cursor-pointer"
+          onclick="return confirm('Are you sure you want to delete this device and associated activities?')"
+          >Delete Device</button>
 
       </div>
 
@@ -88,6 +94,7 @@
 <form id="delete-device-form" method="POST" action="{{ route('devices.delete', $device->id) }}" class="hidden">
   @csrf
   @method('DELETE')
+  <input type="hidden" name="return_url" value="{{ $returnUrl }}">
 </form>
 
 </x-layout>

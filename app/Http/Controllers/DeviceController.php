@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreDeviceRequest;
 use App\Http\Requests\UpdateDeviceRequest;
 use App\Models\Device;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class DeviceController extends Controller
 {
@@ -44,8 +46,10 @@ class DeviceController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(Device $device) {
+      $returnUrl = url()->previous();
       return view('device.edit', [
         'device' => $device,
+        'returnUrl' => $returnUrl,
       ]);
     }
 
@@ -56,11 +60,13 @@ class DeviceController extends Controller
     // authorize (on hold)
     // validate
 
-      dd("ho!!");
-
     $validationRules = [
-      'srjc_tag' => ['required_without:serial_number'],
-      'serial_number' => ['required'],
+      'srjc_tag' => [
+        Rule::unique('devices', 'srjc_tag')->ignore($device->id),
+      ],
+      'serial_number' => [
+        Rule::unique('devices', 'serial_number')->ignore($device->id),
+      ],
       'model_number' => ['required'],
     ];
 
@@ -74,7 +80,8 @@ class DeviceController extends Controller
     ]);
 
     // Redirect to job specific page
-    return redirect('/')->with('success', 'Device and activity successfully updated.');
+    $returnUrl = $request->get('return_url', '/');
+    return redirect($returnUrl)->with('success', 'Device successfully updated.');
   }
 
     /**

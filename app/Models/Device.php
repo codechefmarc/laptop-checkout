@@ -16,7 +16,7 @@ class Device extends Model {
     'updated_at',
   ];
 
-  public function activityLogs() {
+  public function activities() {
     return $this->hasMany(Activity::class);
   }
 

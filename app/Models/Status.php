@@ -10,7 +10,7 @@ class Status extends Model {
   /** @use HasFactory<\Database\Factories\StatusFactory> */
   use HasFactory;
 
-  public function activityLogs() {
+  public function activities() {
     return $this->hasMany(Activity::class);
   }
 

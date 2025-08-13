@@ -113,7 +113,7 @@ class ActivityController extends Controller {
       'notes' => $validated['notes'],
     ]);
 
-    // Redirect to job specific page
+    // Redirect to previous listing page
     $returnUrl = $request->get('return_url', '/');
     return redirect($returnUrl)->with('success', 'Activity successfully updated.');
   }

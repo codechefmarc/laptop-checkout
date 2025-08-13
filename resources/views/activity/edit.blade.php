@@ -1,6 +1,6 @@
 <x-layout>
 <x-slot:heading>
-  Edit Device And Activity
+  Edit Activity
 </x-slot:heading>
 
 <form method="POST" action="{{ route('activities.patch', $activity->id) }}">

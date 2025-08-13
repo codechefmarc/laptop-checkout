@@ -56,7 +56,7 @@
         </div>
 
         <!-- Model Number -->
-        <div>
+        <div class="mb-8">
           <label for="model_number" class="block text-sm font-medium text-gray-700 mb-2">Model Number <span class="text-red-500 text-sm">*</span></label>
           <input
             type="text"

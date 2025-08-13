@@ -4,6 +4,20 @@
         <x-status-select :search="TRUE" />
     </div>
 
+    @php
+      $current_status_checked = request('current_status_only') ? 'checked' : '';
+    @endphp
+
+    <div>
+      <input
+      type="checkbox"
+      name="current_status_only"
+      id="current_status_only"
+      {{ $current_status_checked }}
+      >
+      <label for="current_status_only">Show current status only</label>
+    </div>
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label for="srjc_tag" class="block text-sm font-medium text-gray-700 mb-2">SRJC Tag</label>
