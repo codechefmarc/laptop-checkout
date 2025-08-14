@@ -78,7 +78,7 @@
   @endif
 
   <div class="m-4 text-right">
-    <a href="{{ route('export.allDevices', request()->query()) }}"
+    <a href="{{ route('export.devices', request()->query()) }}"
         class="inline-flex items-center px-4 py-2 bg-green-400 cursor-pointer hover:bg-green-700 hover:text-white text-black-200 text-xs font-medium rounded-md">
         📊 Export CSV
     </a>

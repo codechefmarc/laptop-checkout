@@ -4,18 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Models\Activity;
 use App\Models\Device;
-use Illuminate\Http\Request;
 use App\Models\Status;
+use Illuminate\Http\Request;
 
+/**
+ * Controller for Activity related routing.
+ */
 class ActivityController extends Controller {
 
+  /**
+   * The main activity log page.
+   */
   public function logActivity() {
     return view('log-activity');
   }
 
+  /**
+   * Create a new activity.
+   */
   public function store() {
-    // First, check if this is a second submission with device creation data
-
+    // For use with the device details modal.
     $isCreatingDevice = request()->has('creating_device');
 
     $basicRules = [
@@ -39,44 +47,34 @@ class ActivityController extends Controller {
 
     $validated = request()->validate($basicRules);
 
-    session(['saved_status' => $validated['status_id']]);
-
-    //$device = $this->findExactDevice($validated);
-
-    $device = Device::findBySrjcOrSerial($validated['srjc_tag'] ?? null, $validated['serial_number'] ?? null);
+    $device = Device::findBySrjcOrSerial($validated['srjc_tag'] ?? NULL, $validated['serial_number'] ?? NULL);
 
     if (!$device) {
-      // If we have device creation data, create the device
       if ($isCreatingDevice) {
         $device = Device::create([
-          'srjc_tag' => $validated['srjc_tag'] ?? null,
-          'serial_number' => $validated['serial_number'] ?? null,
+          'srjc_tag' => $validated['srjc_tag'] ?? NULL,
+          'serial_number' => $validated['serial_number'],
           'model_number' => $validated['model_number'],
-          // Add other device fields
         ]);
 
-        // Clear the session flags
         session()->forget(['device_not_found', 'device_data']);
 
-      // Continue to create activity below...
-      } else {
-        // Device doesn't exist and we don't have creation data yet
-        // Return with flag to show hidden fields
+      }
+      else {
+        // Device doesn't exist and we don't have creation data yet.
         return redirect()->back()
           ->withInput()
-          ->with('device_not_found', true)
+          ->with('device_not_found', TRUE)
           ->with('device_data', [
-            'srjc_tag' => $validated['srjc_tag'] ?? null,
-            'serial_number' => $validated['serial_number'] ?? null,
+            'srjc_tag' => $validated['srjc_tag'] ?? NULL,
+            'serial_number' => $validated['serial_number'],
           ]);
       }
     }
     else {
-      // Device found, clear any session flags
       session()->forget(['device_not_found', 'device_data']);
     }
 
-    // Create the activity (this runs whether device was found or just created)
     Activity::create([
       'device_id' => $device->id,
       'status_id' => $validated['status_id'],
@@ -84,9 +82,15 @@ class ActivityController extends Controller {
       'username' => $validated['username'],
     ]);
 
+    // Saves the status for ease of adding multiple devices one after another.
+    session(['saved_status' => $validated['status_id']]);
+
     return redirect()->back()->with('success', 'Activity successfully added.');
   }
 
+  /**
+   * Edit activity.
+   */
   public function edit(Activity $activity) {
     $statuses = Status::all();
     $returnUrl = url()->previous();
@@ -97,27 +101,30 @@ class ActivityController extends Controller {
     ]);
   }
 
+  /**
+   * Update activity.
+   */
   public function patch(Activity $activity, Request $request) {
-    // authorize (on hold)
-    // validate
-
+    // @todo Add LDAP authorize (on hold).
     $validationRules = [
       'status_id' => ['required'],
       'notes' => ['nullable'],
     ];
 
     $validated = request()->validate($validationRules);
-    // Update the activity
+
     $activity->update([
       'status_id' => $validated['status_id'],
       'notes' => $validated['notes'],
     ]);
 
-    // Redirect to previous listing page
     $returnUrl = $request->get('return_url', '/');
     return redirect($returnUrl)->with('success', 'Activity successfully updated.');
   }
 
+  /**
+   * Delete activity.
+   */
   public function delete(Activity $activity, Request $request) {
     $activity->delete();
     $returnUrl = $request->get('return_url', '/');

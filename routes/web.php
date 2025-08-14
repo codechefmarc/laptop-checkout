@@ -32,9 +32,9 @@ Route::controller(ReportsController::class)->group(function () {
 
 Route::get('/api/model-numbers/search', [ModelNumberController::class, 'search']);
 
-Route::controller(ReportsController::class)->group(function () {
-  Route::get('/export/activities', [ExportController::class, 'activities'])->name('export.activities');
-  Route::get('/export/all-devices', [ExportController::class, 'allDevices'])->name('export.allDevices');
+Route::controller(ExportController::class)->group(function () {
+  Route::get('/export/activities', 'activities')->name('export.activities');
+  Route::get('/export/devices', 'devices')->name('export.devices');
 });
 
 Route::any('{catchall}', 'PageController@notfound')->where('catchall', '.*');
