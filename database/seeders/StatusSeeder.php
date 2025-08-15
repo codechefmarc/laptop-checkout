@@ -3,10 +3,13 @@
 namespace Database\Seeders;
 
 use App\Models\Status;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
+/**
+ * Creates real statuses in the database.
+ */
 class StatusSeeder extends Seeder {
+
   /**
    * Run the database seeds.
    */

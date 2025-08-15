@@ -1,10 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+/**
+ * Handles status requests.
+ */
+class StatusController extends Controller {
 
-use Illuminate\Http\Request;
-
-class StatusController extends Controller
-{
-    //
 }

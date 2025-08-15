@@ -5,18 +5,24 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
+ * Provides dummy device data for the database.
+ *
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Device>
  */
 class DeviceFactory extends Factory {
+
   /**
    * Define the model's default state.
    *
-   * @return array<string, mixed>
+   * @return array
+   *   An array of dummy device data.
    */
   public function definition(): array {
 
-    $hasSrjcTag = fake()->numberBetween(1, 10) <= 9; // 90% chance
-    $hasSerial = fake()->numberBetween(1, 10) <= 3;   // 30% chance
+    // 90% chance.
+    $hasSrjcTag = fake()->numberBetween(1, 10) <= 9;
+    // 30% chance.
+    $hasSerial = fake()->numberBetween(1, 10) <= 3;
 
     if (!$hasSrjcTag && !$hasSerial) {
       $hasSerial = TRUE;
@@ -34,13 +40,14 @@ class DeviceFactory extends Factory {
           'Dell Latitude 7650',
           'Dell Latitude 5550',
           'Dell Latitude 5455',
-          null,
-          null,
-          null,
-          null,
-          null,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
+          NULL,
         ]
-      )
+      ),
     ];
   }
+
 }

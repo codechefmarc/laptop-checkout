@@ -2,17 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Activity;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Services\QueryService;
+use Illuminate\Http\Request;
 
+/**
+ * Handles search page.
+ */
 class SearchController extends Controller {
+
+  /**
+   * Main search form.
+   */
   public function search(Request $request) {
 
     $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'device_id', 'model_number']);
 
-    $activities = null; // Default to null (no results to show)
+    $activities = NULL;
 
     if ($hasSearchParams) {
       $query = QueryService::buildSearchQuery($request);
@@ -24,4 +29,3 @@ class SearchController extends Controller {
   }
 
 }
-

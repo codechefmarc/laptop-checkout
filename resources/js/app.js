@@ -19,7 +19,7 @@ import "tom-select/dist/css/tom-select.min.css"
 if (document.getElementById('model_number')) {
 
   new TomSelect('#model_number', {
-    create: true, // Allow creating new entries
+    create: true,
     createOnBlur: true,
     maxItems: 1,
     load: function(query, callback) {

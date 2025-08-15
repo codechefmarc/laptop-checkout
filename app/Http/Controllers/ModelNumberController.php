@@ -5,7 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Device;
 use Illuminate\Http\Request;
 
+/**
+ * API endpoint to get model numbers for autocomplete.
+ */
 class ModelNumberController extends Controller {
+
+  /**
+   * Search function to return model numbers based on query.
+   */
   public function search(Request $request) {
     $query = $request->get('q');
 

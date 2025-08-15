@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Models\Activity;
-use Illuminate\Http\Request;
 use App\Models\Device;
-use Illuminate\Support\Facades\DB;
 use App\Models\Status;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
+/**
+ * Handles report page requests.
+ */
 class ReportsController extends Controller {
+
+  /**
+   * Overall reports page.
+   */
   public function reports(Request $request) {
-    $activities = null;
-    $devices = null;
-    $report_title = null;
+    $activities = NULL;
+    $devices = NULL;
+    $report_title = NULL;
     $device_count = Device::count();
     $status_counts = $this->getCurrentStatus();
 
@@ -39,32 +46,34 @@ class ReportsController extends Controller {
     ]);
   }
 
+  /**
+   * Gets current status of devices.
+   */
   private function getCurrentStatus() {
     $latestActivities = Activity::select('activities.device_id', 'activities.status_id')
-    ->join(DB::raw('(
+      ->join(DB::raw('(
         SELECT device_id, MAX(created_at) as max_date
         FROM activities
         GROUP BY device_id
-    ) as latest'), function ($join) {
-        $join->on('activities.device_id', '=', 'latest.device_id')
-             ->on('activities.created_at', '=', 'latest.max_date');
-    })
-    ->get();
+        ) as latest'),
+        function ($join) {
+          $join->on('activities.device_id', '=', 'latest.device_id')
+            ->on('activities.created_at', '=', 'latest.max_date');
+        })->get();
 
-    // Step 2: Count by status
     $statusCounts = $latestActivities
-    ->groupBy('status_id')
-    ->map(function($group) {
+      ->groupBy('status_id')
+      ->map(function ($group) {
         $status = Status::find($group->first()->status_id);
-        return (object)[
+        return (object) [
           'status_id' => $status->id,
           'status_name' => $status->status_name,
           'description' => $status->description,
           'device_count' => $group->count(),
         ];
-    })
-    ->sortByDesc('device_count')
-    ->values();
+      })
+      ->sortByDesc('device_count')
+      ->values();
 
     return $statusCounts;
   }

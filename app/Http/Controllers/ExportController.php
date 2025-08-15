@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\Device;
 use App\Services\QueryService;
 use Illuminate\Http\Request;
+
 /**
  * Handles export to CSV.
  */
-
 class ExportController extends Controller {
 
   /**
@@ -77,51 +77,15 @@ class ExportController extends Controller {
     return response()->stream(function () use ($devices) {
       $file = fopen('php://output', 'w');
 
-      // CSV Header
-      fputcsv($file, [
-        'Date Updated', 'SRJC Tag', 'Serial Number', 'Model Number',
-      ]);
-
-      // CSV Data
-      foreach ($devices as $device) {
-        fputcsv($file, [
-          $device->updated_at->format('m/d/Y'),
-          $device->srjc_tag ?? '',
-          $device->serial_number ?? '',
-          $device->model_number ?? '',
-        ]);
-      }
-
-      fclose($file);
-    }, 200, $headers);
-  }
-
-  /**
-   * Handles export of all devices.
-   */
-  public function inactiveDevices() {
-
-    $devices = Device::whereDoesntHave('activities')->get();
-
-    $filename = 'devices_' . now()->format('Y-m-d_H-i-s') . '.csv';
-
-    $headers = [
-      'Content-Type' => 'text/csv',
-      'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-    ];
-
-    return response()->stream(function () use ($devices) {
-      $file = fopen('php://output', 'w');
-
       // CSV Header.
       fputcsv($file, [
         'Date Updated', 'SRJC Tag', 'Serial Number', 'Model Number',
       ]);
 
-      // CSV Data
+      // CSV Data.
       foreach ($devices as $device) {
         fputcsv($file, [
-          $device->created_at->format('m/d/Y'),
+          $device->updated_at->format('m/d/Y'),
           $device->srjc_tag ?? '',
           $device->serial_number ?? '',
           $device->model_number ?? '',
