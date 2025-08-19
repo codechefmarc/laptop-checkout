@@ -20,9 +20,13 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Date Updated
           </th>
-          <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Operations
-          </th>
+          @auth
+            @if(auth()->user()->canEdit())
+              <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Operations
+              </th>
+            @endif
+          @endauth
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
@@ -45,12 +49,15 @@
               <div class="text-sm text-gray-900">{{ $device->updated_at->format('m/d/Y') }}</div>
               <div class="text-xs text-gray-500">{{ $device->updated_at->format('g:iA') }}</div>
             </td>
-
-            <td>
-              <div class="text-sm text-gray-900">
-                <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $device->id }}">Edit Device</a>
-              </div>
-            </td>
+            @auth
+              @if(auth()->user()->canEdit())
+                <td>
+                  <div class="text-sm text-gray-900">
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $device->id }}">Edit Device</a>
+                  </div>
+                </td>
+              @endif
+            @endauth
           </tr>
         @empty
           <tr><td colspan="6" class="text-center py-8">No activities found</td></tr>

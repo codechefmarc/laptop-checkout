@@ -25,9 +25,13 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Notes
           </th>
-          <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            Operations
-          </th>
+          @auth
+            @if(auth()->user()->canEdit())
+              <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Operations
+              </th>
+            @endif
+          @endauth
         </tr>
       </thead>
 
@@ -57,16 +61,20 @@
             <td class="px-6 py-4">
               <div class="text-sm text-gray-900">{{ $activity->notes }}</div>
             </td>
-            <td class="px-6 py-4">
-              <div class="text-sm text-gray-900">
-                <a class="text-blue-500 font-semibold hover:text-gray-800" href="/activity/edit/{{ $activity->id }}">Edit Activity</a>
-              </div>
-            </td>
-            <td>
-              <div class="text-sm text-gray-900">
-                <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $activity->device->id }}">Edit Device</a>
-              </div>
-            </td>
+            @auth
+              @if(auth()->user()->canEdit())
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900">
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/activity/edit/{{ $activity->id }}">Edit Activity</a>
+                  </div>
+                </td>
+                <td>
+                  <div class="text-sm text-gray-900">
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $activity->device->id }}">Edit Device</a>
+                  </div>
+                </td>
+              @endif
+            @endauth
           </tr>
         @empty
           <tr><td colspan="6" class="text-center py-8">No activities found</td></tr>

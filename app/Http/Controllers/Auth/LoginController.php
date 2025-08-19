@@ -45,7 +45,7 @@ class LoginController extends Controller {
       $request->session()->regenerate();
       $user = Auth::user();
       if ($user->isAdmin() || $user->canEdit()) {
-        return redirect()->intended('/');
+        return redirect()->intended('/log');
       }
       else {
         return redirect()->intended('/search');

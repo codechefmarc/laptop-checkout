@@ -31,9 +31,12 @@
             @auth
               <form method="POST" action="{{ route('logout') }}" class="inline">
                 @csrf
+                <div class="flex items-center">
+                <p class="mr-3 text-sm font-medium">Logged in as {{ auth()->user()->first_name }}</p>
                 <button type="submit" class="text-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">
-                  Logout ({{ auth()->user()->first_name }})
-                </button>
+                    Logout
+                  </button>
+                </div>
               </form>
             @else
               <a href="{{ route('login') }}" class="ext-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">

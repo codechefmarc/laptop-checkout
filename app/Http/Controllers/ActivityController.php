@@ -6,6 +6,7 @@ use App\Models\Activity;
 use App\Models\Device;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Controller for Activity related routing.
@@ -79,7 +80,7 @@ class ActivityController extends Controller {
       'device_id' => $device->id,
       'status_id' => $validated['status_id'],
       'notes' => $validated['notes'],
-      'username' => $validated['username'],
+      'username' => Auth::user()->first_name . ' ' . Auth::user()->last_name,
     ]);
 
     // Saves the status for ease of adding multiple devices one after another.

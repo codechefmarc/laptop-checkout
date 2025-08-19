@@ -15,6 +15,8 @@ use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\UserController;
 
+Route::view('/', 'welcome');
+
 // Authentication.
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('login', [LoginController::class, 'login']);
@@ -25,41 +27,52 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
   Route::resource('users', UserController::class)->except(['show']);
 });
 
-Route::view('/', 'welcome');
-
 // Activities.
-Route::controller(ActivityController::class)->group(function () {
-  Route::get('/log', 'logActivity');
-  Route::post('/', 'store');
-  Route::patch('/{activity}', 'patch')->name('activities.patch');
-  Route::get('/activity/edit/{activity}', 'edit');
-  Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
+Route::middleware(['auth', 'can.edit'])->group(function () {
+  Route::controller(ActivityController::class)->group(function () {
+    Route::get('/log', 'logActivity');
+    Route::post('/', 'store');
+    Route::patch('/{activity}', 'patch')->name('activities.patch');
+    Route::get('/activity/edit/{activity}', 'edit');
+    Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
+  });
 });
 
 // Devices.
-Route::controller(DeviceController::class)->group(function () {
-  Route::patch('/device/{device}', 'patch')->name('devices.patch');
-  Route::get('/device/edit/{device}', 'edit');
-  Route::delete('/device/delete/{device}', 'delete')->name('devices.delete');
+
+Route::middleware(['auth', 'can.edit'])->group(function () {
+  Route::controller(DeviceController::class)->group(function () {
+    Route::patch('/device/{device}', 'patch')->name('devices.patch');
+    Route::get('/device/edit/{device}', 'edit');
+    Route::delete('/device/delete/{device}', 'delete')->name('devices.delete');
+  });
 });
 
 // Search.
-Route::controller(SearchController::class)->group(function () {
-  Route::get('/search', 'search')->name('search');
+Route::middleware(['auth'])->group(function () {
+  Route::controller(SearchController::class)->group(function () {
+    Route::get('/search', 'search')->name('search');
+  });
 });
 
 // Reports.
-Route::controller(ReportsController::class)->group(function () {
-  Route::get('/reports', 'reports');
+Route::middleware(['auth'])->group(function () {
+  Route::controller(ReportsController::class)->group(function () {
+    Route::get('/reports', 'reports');
+  });
 });
 
 // API autocomplete.
-Route::get('/api/model-numbers/search', [ModelNumberController::class, 'search']);
+Route::middleware(['auth', 'can.edit'])->group(function () {
+  Route::get('/api/model-numbers/search', [ModelNumberController::class, 'search']);
+});
 
 // Export.
-Route::controller(ExportController::class)->group(function () {
-  Route::get('/export/activities', 'activities')->name('export.activities');
-  Route::get('/export/devices', 'devices')->name('export.devices');
+Route::middleware(['auth'])->group(function () {
+  Route::controller(ExportController::class)->group(function () {
+    Route::get('/export/activities', 'activities')->name('export.activities');
+    Route::get('/export/devices', 'devices')->name('export.devices');
+  });
 });
 
 // Errors.

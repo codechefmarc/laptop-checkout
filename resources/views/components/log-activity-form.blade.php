@@ -40,16 +40,6 @@
         </div>
     </div>
 
-    <div>
-      <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-          User <small class="text-gray-500">(Temporary - Will be automated after login implemented)</small>
-      </label>
-      <input type="username"
-        id="username"
-        name="username"
-        value=""
-        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-    </div>
   </div>
 
   <button type="submit" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
