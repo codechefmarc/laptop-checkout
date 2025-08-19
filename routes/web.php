@@ -1,16 +1,35 @@
 <?php
 
+/**
+ * @file
+ * Routing file for app.
+ */
+
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\ExportController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ModelNumberController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ExportController;
+use App\Http\Controllers\Admin\UserController;
+
+// Authentication.
+Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
+Route::post('login', [LoginController::class, 'login']);
+Route::post('logout', [LoginController::class, 'logout'])->name('logout');
+
+// Admin users.
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+  Route::resource('users', UserController::class)->except(['show']);
+});
+
+Route::view('/', 'welcome');
 
 // Activities.
 Route::controller(ActivityController::class)->group(function () {
-  Route::get('/', 'logActivity');
+  Route::get('/log', 'logActivity');
   Route::post('/', 'store');
   Route::patch('/{activity}', 'patch')->name('activities.patch');
   Route::get('/activity/edit/{activity}', 'edit');

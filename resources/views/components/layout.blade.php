@@ -19,7 +19,7 @@
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
               <div class="shrink-0">
-                <img src="/images/srjc-logo-wide.webp" alt="Santa Rosa Junior College" class="w-50 h-auto" />
+                <a href="/"><img src="/images/srjc-logo-wide.webp" alt="Santa Rosa Junior College" class="w-50 h-auto" /></a>
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">
@@ -27,6 +27,19 @@
                 </div>
               </div>
             </div>
+
+            @auth
+              <form method="POST" action="{{ route('logout') }}" class="inline">
+                @csrf
+                <button type="submit" class="text-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">
+                  Logout ({{ auth()->user()->first_name }})
+                </button>
+              </form>
+            @else
+              <a href="{{ route('login') }}" class="ext-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">
+                Login
+              </a>
+            @endauth
 
             <div class="-mr-2 flex md:hidden">
               <!-- Mobile menu button -->

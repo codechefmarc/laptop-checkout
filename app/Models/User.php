@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -11,9 +12,6 @@ use Illuminate\Notifications\Notifiable;
  * Describes a user and provides user methods.
  */
 class User extends Authenticatable {
-  /**
-   * @use HasFactory<\Database\Factories\UserFactory>
-   */
   use HasFactory, Notifiable;
 
   /**
@@ -22,7 +20,9 @@ class User extends Authenticatable {
    * @var list<string>
    */
   protected $fillable = [
-    'name',
+    'first_name',
+    'last_name',
+    'role_id',
     'email',
     'password',
   ];
@@ -48,6 +48,41 @@ class User extends Authenticatable {
       'email_verified_at' => 'datetime',
       'password' => 'hashed',
     ];
+  }
+
+  /**
+   * Return the role the user belongs to.
+   */
+  public function role(): BelongsTo {
+    return $this->belongsTo(Role::class);
+  }
+
+  /**
+   * Tests if a user has a specific role.
+   */
+  public function hasRole(string $roleName): bool {
+    return $this->role->name === $roleName;
+  }
+
+  /**
+   * Tests if the user is an admin.
+   */
+  public function isAdmin(): bool {
+    return $this->hasRole('admin');
+  }
+
+  /**
+   * Test if the user can edit.
+   */
+  public function canEdit(): bool {
+    return $this->hasRole('admin') || $this->hasRole('data_entry');
+  }
+
+  /**
+   * Tests if the user is read only.
+   */
+  public function isReadOnly(): bool {
+    return $this->hasRole('read_only');
   }
 
 }
