@@ -1,4 +1,4 @@
-<form method="POST" action="/" class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+<form method="POST" action="/log" class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   @csrf
   <div class="space-y-6">
     <div>

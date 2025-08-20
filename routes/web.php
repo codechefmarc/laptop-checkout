@@ -16,7 +16,13 @@ use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::get('/it/laptop-checkout', function () {
+    return view('welcome');
+});
 
 // Authentication.
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -32,7 +38,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::middleware(['auth', 'can.edit'])->group(function () {
   Route::controller(ActivityController::class)->group(function () {
     Route::get('/log', 'logActivity');
-    Route::post('/', 'store');
+    Route::post('/log', 'store');
     Route::patch('/{activity}', 'patch')->name('activities.patch');
     Route::get('/activity/edit/{activity}', 'edit');
     Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
