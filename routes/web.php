@@ -6,14 +6,15 @@
  */
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ExportController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\ModelNumberController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\UserController;
 
 Route::view('/', 'welcome');
 
@@ -76,4 +77,4 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Errors.
-Route::any('{catchall}', 'PageController@notfound')->where('catchall', '.*');
+Route::any('{catchall}', [PageController::class, 'notfound'])->where('catchall', '.*');

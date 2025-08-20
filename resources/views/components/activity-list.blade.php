@@ -64,12 +64,12 @@
             @auth
               @if(auth()->user()->canEdit())
                 <td class="px-6 py-4">
-                  <div class="text-sm text-gray-900">
+                  <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 font-semibold hover:text-gray-800" href="/activity/edit/{{ $activity->id }}">Edit Activity</a>
                   </div>
                 </td>
-                <td>
-                  <div class="text-sm text-gray-900">
+                <td class="px-6 py-4">
+                  <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $activity->device->id }}">Edit Device</a>
                   </div>
                 </td>
