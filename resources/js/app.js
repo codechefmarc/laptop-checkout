@@ -12,6 +12,10 @@ if (date_range) {
   });
 }
 
+if (window.apiRoute === undefined) {
+  window.apiRoute = '/api/model-numbers/search';
+}
+
 // Autocomplete.
 import TomSelect from 'tom-select';
 import "tom-select/dist/css/tom-select.min.css"
@@ -25,7 +29,7 @@ if (document.getElementById('model_number')) {
     load: function(query, callback) {
       if (!query.length) return callback();
 
-      fetch('/api/model-numbers/search?q=' + encodeURIComponent(query))
+      fetch(window.apiRoute + '?q=' + encodeURIComponent(query))
       .then(response => response.json())
       .then(json => {
         callback(json.map(item => ({

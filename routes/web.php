@@ -71,7 +71,7 @@ Route::middleware(['auth'])->group(function () {
 
 // API autocomplete.
 Route::middleware(['auth', 'can.edit'])->group(function () {
-  Route::get('/api/model-numbers/search', [ModelNumberController::class, 'search']);
+  Route::get('/api/model-numbers/search', [ModelNumberController::class, 'search'])->name('api.model-numbers');
 });
 
 // Export.

@@ -46,3 +46,8 @@
     Log Device Activity
   </button>
 </form>
+
+<script>
+  // Set the API route to be used in the autocomplete script.
+  window.apiRoute = '{{ route("api.model-numbers") }}';
+</script>
