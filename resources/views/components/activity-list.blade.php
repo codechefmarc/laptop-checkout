@@ -65,12 +65,12 @@
               @if(auth()->user()->canEdit())
                 <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/activity/edit/{{ $activity->id }}">Edit Activity</a>
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('activities.edit', $activity->id) }}">Edit Activity</a>
                   </div>
                 </td>
                 <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $activity->device->id }}">Edit Device</a>
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('devices.edit', $activity->device->id) }}">Edit Device</a>
                   </div>
                 </td>
               @endif

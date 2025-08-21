@@ -83,5 +83,5 @@
     <button type="submit" class="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
       Search
     </button>
-    <a href="/search" class="ml-3 text-gray-900 cursor-pointer">Reset</a>
+    <a href="{{ route('search') }}" class="ml-3 text-gray-900 cursor-pointer">Reset</a>
 </form>

@@ -50,7 +50,7 @@
           <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-end space-x-2">
               <a href="{{ route('admin.users.edit', $user) }}"
-                 class="text-indigo-600 hover:text-indigo-900 font-medium">Edit</a>
+                 class="text-indigo-600 hover:text-indigo-900 font-medium mr-3">Edit</a>
 
               @if($user->id !== auth()->id())
                 <button

@@ -40,7 +40,7 @@ Route::middleware(['auth', 'can.edit'])->group(function () {
     Route::get('/log', 'logActivity')->name('log');
     Route::post('/log', 'store');
     Route::patch('/{activity}', 'patch')->name('activities.patch');
-    Route::get('/activity/edit/{activity}', 'edit');
+    Route::get('/activity/edit/{activity}', 'edit')->name('activities.edit');
     Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
   });
 });
@@ -50,7 +50,7 @@ Route::middleware(['auth', 'can.edit'])->group(function () {
 Route::middleware(['auth', 'can.edit'])->group(function () {
   Route::controller(DeviceController::class)->group(function () {
     Route::patch('/device/{device}', 'patch')->name('devices.patch');
-    Route::get('/device/edit/{device}', 'edit');
+    Route::get('/device/edit/{device}', 'edit')->name('devices.edit');
     Route::delete('/device/delete/{device}', 'delete')->name('devices.delete');
   });
 });

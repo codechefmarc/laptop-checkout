@@ -23,7 +23,7 @@
     <ul>
 
     @foreach($status_counts as $status)
-      <li><a class="text-blue-500" href="/search?status_id={{ $status->status_id }}&current_status_only=on"> {{ $status->status_name }} ({{ $status->device_count }})</a></li>
+      <li><a class="text-blue-500" href="{{ route('search', ['status_id' => $status->status_id, 'current_status_only' => 'on']) }}"> {{ $status->status_name }} ({{ $status->device_count }})</a></li>
     @endforeach
 
     </ul>
