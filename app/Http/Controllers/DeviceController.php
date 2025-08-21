@@ -45,7 +45,7 @@ class DeviceController extends Controller {
       'model_number' => $validated['model_number'],
     ]);
 
-    $returnUrl = $request->get('return_url', '/');
+    $returnUrl = $request->get('return_url', route('log'));
     return redirect($returnUrl)->with('success', 'Device successfully updated.');
   }
 
@@ -54,7 +54,7 @@ class DeviceController extends Controller {
    */
   public function delete(Device $device) {
     $device->delete();
-    return redirect('/')->with('success', 'Device and associated activities deleted.');
+    return redirect()->route('log')->with('success', 'Device and associated activities deleted.');
   }
 
 }

@@ -119,7 +119,7 @@ class ActivityController extends Controller {
       'notes' => $validated['notes'],
     ]);
 
-    $returnUrl = $request->get('return_url', '/');
+    $returnUrl = $request->get('return_url', route('log'));
     return redirect($returnUrl)->with('success', 'Activity successfully updated.');
   }
 
@@ -128,7 +128,7 @@ class ActivityController extends Controller {
    */
   public function delete(Activity $activity, Request $request) {
     $activity->delete();
-    $returnUrl = $request->get('return_url', '/');
+    $returnUrl = $request->get('return_url', route('log'));
     return redirect($returnUrl)->with('success', 'Activity deleted.');
   }
 
