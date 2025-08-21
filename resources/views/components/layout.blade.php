@@ -19,7 +19,7 @@
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
               <div class="shrink-0">
-                <a href="/it/laptop-checkout"><img src="images/srjc-logo-wide.webp" alt="Santa Rosa Junior College" class="w-50 h-auto" /></a>
+                <a href="{{ url('/') }}"><img src="{{ asset('images/srjc-logo-wide.webp') }}" alt="Santa Rosa Junior College" class="w-50 h-auto" /></a>
               </div>
               <div class="hidden md:block">
                 <div class="ml-10 flex items-baseline space-x-4">

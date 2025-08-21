@@ -37,7 +37,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 // Activities.
 Route::middleware(['auth', 'can.edit'])->group(function () {
   Route::controller(ActivityController::class)->group(function () {
-    Route::get('/log', 'logActivity');
+    Route::get('/log', 'logActivity')->name('log');
     Route::post('/log', 'store');
     Route::patch('/{activity}', 'patch')->name('activities.patch');
     Route::get('/activity/edit/{activity}', 'edit');
@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
 // Reports.
 Route::middleware(['auth'])->group(function () {
   Route::controller(ReportsController::class)->group(function () {
-    Route::get('/reports', 'reports');
+    Route::get('/reports', 'reports')->name('reports');
   });
 });
 
