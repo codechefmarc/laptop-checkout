@@ -5,7 +5,7 @@
         <h3 class="text-lg font-semibold text-gray-900">New Device Details</h3>
         <p class="text-sm text-gray-600 mt-1">This device doesn't exist yet. Please provide additional details.</p>
       </div>
-      <form method="POST" action="/log">
+      <form method="POST" action="{{ route('log') }}">
         @csrf
         <!-- Hidden fields for activity data -->
         <input type="hidden" name="creating_device" value="1">
