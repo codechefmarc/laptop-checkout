@@ -27,10 +27,12 @@ class ReportsController extends Controller {
       if ($request['report'] == 'all_devices') {
         $report_title = 'All Devices';
         $devices = Device::latest('updated_at')->paginate(20);
+        $devices->appends(['report' => 'all_devices']);
       }
       if ($request['report'] == 'inactive_devices') {
         $report_title = 'Inactive Devices (' . Device::whereDoesntHave('activities')->count() . ")";
         $devices = Device::whereDoesntHave('activities')->latest('updated_at')->paginate(20);
+        $devices->appends(['report' => 'inactive_devices']);
       }
       else {
         $report_title = 'All Devices (' . $device_count . ")";

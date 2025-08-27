@@ -46,7 +46,6 @@ Route::middleware(['auth', 'can.edit'])->group(function () {
 });
 
 // Devices.
-
 Route::middleware(['auth', 'can.edit'])->group(function () {
   Route::controller(DeviceController::class)->group(function () {
     Route::patch('/device/{device}', 'patch')->name('devices.patch');
