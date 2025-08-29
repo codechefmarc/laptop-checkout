@@ -15,7 +15,10 @@
   <body class="h-full">
 
     <div class="min-h-full">
-      <nav class="bg-white-800">
+    <div class="bg-gray-600 text-white flex justify-end">
+      <x-nav-auth/>
+    </div>
+    <nav class="bg-white-800">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div class="flex h-16 items-center justify-between">
             <div class="flex items-center">
@@ -28,22 +31,6 @@
                 </div>
               </div>
             </div>
-
-            @auth
-              <form method="POST" action="{{ route('logout') }}" class="inline">
-                @csrf
-                <div class="flex items-center">
-                <p class="mr-3 text-sm font-medium">Logged in as {{ auth()->user()->first_name }}</p>
-                <button type="submit" class="text-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">
-                    Logout
-                  </button>
-                </div>
-              </form>
-            @else
-              <a href="{{ route('login') }}" class="ext-gray-900 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-sm font-medium">
-                Login
-              </a>
-            @endauth
 
             <div class="-mr-2 flex md:hidden">
               <!-- Mobile menu button -->
