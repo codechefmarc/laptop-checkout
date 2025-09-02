@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Activity;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -84,6 +85,32 @@ class QueryService {
           ->groupBy('device_id');
       });
     }
+    return $query;
+  }
+
+  /**
+   * Builds a query based on requests for search and export.
+   */
+  public static function buildDeviceSearchQuery(Request $request) {
+
+    // Start with a base query.
+    $query = Device::query();
+
+    // Handle SRJC Filter.
+    if ($request->filled('srjc_tag')) {
+      $query->where('srjc_tag', $request->srjc_tag);
+    }
+
+    // Handle Serial Number.
+    if ($request->filled('serial_number')) {
+      $query->where('serial_number', $request->serial_number);
+    }
+
+    // Handle Model Number.
+    if ($request->filled('model_number')) {
+      $query->where('model_number', 'LIKE', '%' . $request->model_number . '%');
+    }
+
     return $query;
   }
 

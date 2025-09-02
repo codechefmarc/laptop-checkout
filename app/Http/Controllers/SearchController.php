@@ -15,7 +15,13 @@ class SearchController extends Controller {
    */
   public function search(Request $request) {
 
-    $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'device_id', 'model_number']);
+    $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'srjc_tag', 'serial_number', 'model_number']);
+
+    // With device search, only return results if no status or date is set.
+    $hasDeviceSearchParams =
+      $request->hasAny(['srjc_tag', 'serial_number', 'model_number'])
+      && $request->string('status_id') == 'any'
+      && !$request->filled('date_range');
 
     $activities = NULL;
 
@@ -25,7 +31,15 @@ class SearchController extends Controller {
       $activities->appends($request->query());
     }
 
-    return view('search', compact('activities'));
+    $devices = NULL;
+
+    if ($hasDeviceSearchParams) {
+      $query = QueryService::buildDeviceSearchQuery($request);
+      $devices = $query->orderBy('srjc_tag')->paginate(20);
+      $devices->appends($request->query());
+    }
+
+    return view('search', compact('activities', 'devices'));
   }
 
 }
