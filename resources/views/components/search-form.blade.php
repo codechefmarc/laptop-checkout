@@ -85,7 +85,3 @@
     </button>
     <a href="{{ route('search') }}" class="ml-3 text-gray-900 cursor-pointer">Reset</a>
 </form>
-<script>
-  // Set the API route to be used in the autocomplete script.
-  window.apiRoute = '{{ route("api.model-numbers") }}';
-</script>
