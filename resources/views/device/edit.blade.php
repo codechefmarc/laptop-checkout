@@ -97,4 +97,9 @@
   <input type="hidden" name="return_url" value="{{ $returnUrl }}">
 </form>
 
+<script>
+  // Set the API route to be used in the autocomplete script.
+  window.apiRoute = '{{ route("api.model-numbers") }}';
+</script>
+
 </x-layout>
