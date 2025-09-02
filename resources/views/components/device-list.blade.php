@@ -53,7 +53,7 @@
               @if(auth()->user()->canEdit())
                 <td>
                   <div class="text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $device->id }}">Edit Device</a>
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('devices.edit', $device->id) }}">Edit Device</a>
                   </div>
                 </td>
               @endif
