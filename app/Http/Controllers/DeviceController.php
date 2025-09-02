@@ -29,6 +29,8 @@ class DeviceController extends Controller {
     // @todo Add LDAP authentication.
     $validationRules = [
       'srjc_tag' => [
+        'nullable',
+        'sometimes',
         Rule::unique('devices', 'srjc_tag')->ignore($device->id),
       ],
       'serial_number' => [
