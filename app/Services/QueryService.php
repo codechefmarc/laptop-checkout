@@ -78,6 +78,13 @@ class QueryService {
       }
     }
 
+    // Handle Pool Filter.
+    if ($request->filled('pool_id')) {
+      $query->whereHas('device', function ($q) use ($request) {
+        $q->where('pool_id', $request->pool_id);
+      });
+    }
+
     if ($request->has('current_status_only')) {
       $query->whereIn(DB::raw('(device_id, created_at)'), function ($subquery) {
         $subquery->select('device_id', DB::raw('MAX(created_at)'))
@@ -109,6 +116,11 @@ class QueryService {
     // Handle Model Number.
     if ($request->filled('model_number')) {
       $query->where('model_number', 'LIKE', '%' . $request->model_number . '%');
+    }
+
+    // Handle Pool Filter.
+    if ($request->filled('pool_id')) {
+      $query->where('pool_id', $request->pool_id);
     }
 
     return $query;

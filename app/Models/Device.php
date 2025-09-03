@@ -30,6 +30,13 @@ class Device extends Model {
   }
 
   /**
+   * Each device belongs to one pool.
+   */
+  public function pool() {
+    return $this->belongsTo(Pool::class);
+  }
+
+  /**
    * Retrieves the latest activity for a given device.
    */
   public function latestActivity() {

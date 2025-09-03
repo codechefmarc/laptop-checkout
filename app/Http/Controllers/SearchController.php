@@ -15,11 +15,20 @@ class SearchController extends Controller {
    */
   public function search(Request $request) {
 
-    $hasSearchParams = $request->hasAny(['status_id', 'date_range', 'srjc_tag', 'serial_number', 'model_number']);
+    $hasSearchParams = $request->hasAny(
+      [
+        'status_id',
+        'date_range',
+        'srjc_tag',
+        'serial_number',
+        'model_number',
+        'pool_id',
+      ]
+    );
 
     // With device search, only return results if no status or date is set.
     $hasDeviceSearchParams =
-      $request->hasAny(['srjc_tag', 'serial_number', 'model_number'])
+      $request->hasAny(['srjc_tag', 'serial_number', 'model_number', 'pool_id'])
       && $request->string('status_id') == 'any'
       && !$request->filled('date_range');
 

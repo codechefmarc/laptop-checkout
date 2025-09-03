@@ -6,26 +6,37 @@
 
 <div class="flex justify-between max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   <div>
-    <h3 class="font-bold text-xl text-gray-600 mb-3">Select a report</h3>
+    <h3 class="font-bold text-xl text-gray-600 mb-3">Devices</h3>
+    <ul>
+      <li><a class="text-blue-500" href="?report=all_devices">All Devices</a> ({{ $device_count }})</li>
+      <li><a class="text-blue-500" href="?report=inactive_devices">Inactive Devices</a> ({{ $inactive_count }})</li>
+    </ul>
+    <h3 class="font-bold text-xl text-gray-600 mb-3 mt-3">Devices by Pool</h3>
       <ul>
-        <li><a class="text-blue-500" href="?report=all_devices">All Devices</a></li>
-        <li><a class="text-blue-500" href="?report=inactive_devices">Inactive Devices</a></li>
+        @foreach($pool_counts as $pool)
+          <li>
+            <a class="text-blue-500" href="{{ route('reports', ['report' => 'devices_by_pool', 'pool_id' => $pool->pool_id, ]) }}"> {{ $pool->pool_name }}</a> ({{ $pool->device_count }})
+          </li>
+        @endforeach
       </ul>
   </div>
 
   <div class="report-quick-facts">
-    <h3 class="font-bold text-xl text-gray-600 mb-3">Quick Facts</h3>
+    <h3 class="font-bold text-xl text-gray-600 mb-3">Current Activity by Status</h3>
     <ul>
-      <li>Total Devices: {{ $device_count }}</li>
-    </ul>
-    <h3>Device Current Status</h3>
-    <small>Click on a status to view current devices.</small>
-    <ul>
-
     @foreach($status_counts as $status)
-      <li><a class="text-blue-500" href="{{ route('search', ['status_id' => $status->status_id, 'current_status_only' => 'on']) }}"> {{ $status->status_name }} ({{ $status->device_count }})</a></li>
+      <li><a class="text-blue-500" href="{{ route('search', ['status_id' => $status->status_id, 'current_status_only' => 'on']) }}"> {{ $status->status_name }}</a> ({{ $status->device_count }})</li>
     @endforeach
 
+    </ul>
+
+    <h3 class="font-bold text-xl text-gray-600 mb-3 mt-3">Current Activity by Pool</h3>
+    <ul>
+      @foreach($pool_counts_current as $pool)
+        <li>
+          <a class="text-blue-500" href="{{ route('search', ['pool_id' => $pool->pool_id, 'current_status_only' => 'on']) }}"> {{ $pool->pool_name }}</a> ({{ $pool->device_count }})
+        </li>
+      @endforeach
     </ul>
   </div>
 </div>
