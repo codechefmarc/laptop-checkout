@@ -22,10 +22,11 @@ class Pool extends Model {
     'updated_at',
   ];
 
-  public function activities() {
-    return $this->hasMany(Activity::class);
+  /**
+   * Each pool has many devices.
+   */
+  public function devices() {
+    return $this->hasMany(Device::class);
   }
+
 }
-
-
-

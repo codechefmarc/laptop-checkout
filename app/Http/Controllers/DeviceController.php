@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\Pool;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -16,8 +17,10 @@ class DeviceController extends Controller {
    */
   public function edit(Device $device) {
     $returnUrl = url()->previous();
+    $pools = Pool::all();
     return view('device.edit', [
       'device' => $device,
+      'pools' => $pools,
       'returnUrl' => $returnUrl,
     ]);
   }
@@ -35,6 +38,7 @@ class DeviceController extends Controller {
         Rule::unique('devices', 'serial_number')->ignore($device->id),
       ],
       'model_number' => ['required'],
+      'pool_id' => ['required'],
     ];
 
     $validated = request()->validate($validationRules);
@@ -43,6 +47,7 @@ class DeviceController extends Controller {
       'srjc_tag' => $validated['srjc_tag'],
       'serial_number' => $validated['serial_number'],
       'model_number' => $validated['model_number'],
+      'pool_id' => $validated['pool_id'],
     ]);
 
     $returnUrl = $request->get('return_url', route('log'));

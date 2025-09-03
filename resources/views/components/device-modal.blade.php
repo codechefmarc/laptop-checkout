@@ -55,6 +55,11 @@
               <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
             @enderror
           </div>
+          <div class="mb-8">
+            <x-pool-select :selected=1/>
+            @error('pool_id')
+              <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
+            @enderror
         </div>
         <div class="px-6 py-4 border-t border-gray-200 flex gap-2 justify-end space-x-3">
           <a href="{{ route('log') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">

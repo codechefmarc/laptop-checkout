@@ -30,10 +30,10 @@ class Device extends Model {
   }
 
   /**
-   * Each device has one pool.
+   * Each device belongs to one pool.
    */
   public function pool() {
-    return $this->hasOne(Activity::class);
+    return $this->belongsTo(Pool::class);
   }
 
   /**

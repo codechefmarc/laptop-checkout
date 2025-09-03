@@ -65,6 +65,13 @@
           </div>
         </div>
 
+        <div class="">
+          <x-pool-select :selected="$device->pool_id" :pools="$pools"/>
+            @error('pool_id')
+              <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
       </div>
     </div>
 <div class="mt-6 sm:flex max-w-2xl items-center justify-between">
