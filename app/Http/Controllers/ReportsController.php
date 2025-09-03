@@ -28,7 +28,7 @@ class ReportsController extends Controller {
 
       switch ($request['report']) {
         case 'all_devices':
-          $report_title = 'All Devices';
+          $report_title = 'All Devices (' . Device::count() . ")";
           $devices = Device::orderBy('srjc_tag')->paginate(20);
           $devices->appends(['report' => 'all_devices']);
           break;
