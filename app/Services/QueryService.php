@@ -79,7 +79,7 @@ class QueryService {
     }
 
     // Handle Pool Filter.
-    if ($request->filled('pool_id')) {
+    if ($request->filled('pool_id') && $request->pool_id !== 'any') {
       $query->whereHas('device', function ($q) use ($request) {
         $q->where('pool_id', $request->pool_id);
       });
@@ -119,7 +119,7 @@ class QueryService {
     }
 
     // Handle Pool Filter.
-    if ($request->filled('pool_id')) {
+    if ($request->filled('pool_id') && $request->pool_id !== 'any') {
       $query->where('pool_id', $request->pool_id);
     }
 

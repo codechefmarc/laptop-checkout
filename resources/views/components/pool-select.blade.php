@@ -18,6 +18,10 @@
       {{ !$search ? 'required' : '' }}
     >
 
+    @if($search)
+      <option value="any">-- Any --</option>
+    @endif
+
       @foreach ($pools as $pool)
         @php
           if($search) {
