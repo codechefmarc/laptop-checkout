@@ -18,6 +18,9 @@
             Model Number
           </th>
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Pool
+          </th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Date Updated
           </th>
           @auth
@@ -46,6 +49,10 @@
             </td>
 
             <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">{{ $device->pool ? $device->pool->name : ''}}</div>
+            </td>
+
+            <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm text-gray-900">{{ $device->updated_at->format('m/d/Y') }}</div>
               <div class="text-xs text-gray-500">{{ $device->updated_at->format('g:iA') }}</div>
             </td>
@@ -53,7 +60,7 @@
               @if(auth()->user()->canEdit())
                 <td>
                   <div class="text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="/device/edit/{{ $device->id }}">Edit Device</a>
+                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('devices.edit', $device->id) }}">Edit Device</a>
                   </div>
                 </td>
               @endif

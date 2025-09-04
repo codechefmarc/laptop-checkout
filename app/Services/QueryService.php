@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Activity;
+use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -77,6 +78,13 @@ class QueryService {
       }
     }
 
+    // Handle Pool Filter.
+    if ($request->filled('pool_id') && $request->pool_id !== 'any') {
+      $query->whereHas('device', function ($q) use ($request) {
+        $q->where('pool_id', $request->pool_id);
+      });
+    }
+
     if ($request->has('current_status_only')) {
       $query->whereIn(DB::raw('(device_id, created_at)'), function ($subquery) {
         $subquery->select('device_id', DB::raw('MAX(created_at)'))
@@ -84,6 +92,37 @@ class QueryService {
           ->groupBy('device_id');
       });
     }
+    return $query;
+  }
+
+  /**
+   * Builds a query based on requests for search and export.
+   */
+  public static function buildDeviceSearchQuery(Request $request) {
+
+    // Start with a base query.
+    $query = Device::query();
+
+    // Handle SRJC Filter.
+    if ($request->filled('srjc_tag')) {
+      $query->where('srjc_tag', $request->srjc_tag);
+    }
+
+    // Handle Serial Number.
+    if ($request->filled('serial_number')) {
+      $query->where('serial_number', $request->serial_number);
+    }
+
+    // Handle Model Number.
+    if ($request->filled('model_number')) {
+      $query->where('model_number', 'LIKE', '%' . $request->model_number . '%');
+    }
+
+    // Handle Pool Filter.
+    if ($request->filled('pool_id') && $request->pool_id !== 'any') {
+      $query->where('pool_id', $request->pool_id);
+    }
+
     return $query;
   }
 

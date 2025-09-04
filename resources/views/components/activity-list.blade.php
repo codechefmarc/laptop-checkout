@@ -48,6 +48,9 @@
               <div class="text-sm font-medium text-gray-900">SRJC: {{ $activity->device->srjc_tag }}</div>
               <div class="text-xs text-gray-500">{{ $activity->device->serial_number ? 'SN: ' . $activity->device->serial_number : '' }}</div>
               <div class="text-xs text-gray-500">{{ $activity->device->model_number }}</div>
+              @if($activity->device->pool && $activity->device->pool->id !== 1)
+                <div class="text-xs text-violet-500">{{ $activity->device->pool->name }}</div>
+              @endif
             </td>
 
             <td class="px-6 py-4 whitespace-nowrap">

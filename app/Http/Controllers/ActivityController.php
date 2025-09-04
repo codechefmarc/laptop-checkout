@@ -38,6 +38,7 @@ class ActivityController extends Controller {
     if ($isCreatingDevice) {
       $basicRules['model_number'] = ['required'];
       $basicRules['serial_number'] = ['required'];
+      $basicRules['pool_id'] = ['required', 'exists:pools,id'];
 
       $basicRules['serial_number'][] = 'unique:devices,serial_number';
       if (request()->filled('srjc_tag')) {
@@ -61,6 +62,7 @@ class ActivityController extends Controller {
           'srjc_tag' => $validated['srjc_tag'] ?? NULL,
           'serial_number' => $validated['serial_number'],
           'model_number' => $validated['model_number'],
+          'pool_id' => $validated['pool_id'],
         ]);
 
         session()->forget(['device_not_found', 'device_data']);

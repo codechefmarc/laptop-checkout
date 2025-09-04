@@ -93,5 +93,11 @@
         @if (Route::has('login'))
             <div class="h-14.5 hidden lg:block"></div>
         @endif
-    </body>
+
+    <script>
+      // Set the API route to be used in the autocomplete script.
+      window.apiRoute = '{{ route("api.model-numbers") }}';
+    </script>
+
+  </body>
 </html>
