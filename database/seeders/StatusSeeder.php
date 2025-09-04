@@ -19,6 +19,7 @@ class StatusSeeder extends Seeder {
       'Imaging' => 'bg-yellow-600',
       'Surplus' => 'bg-gray-600',
       'Repair' => 'bg-blue-600',
+      'Hold' => 'bg-stone-500',
     ];
 
     foreach ($statuses as $name => $class) {
