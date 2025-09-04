@@ -21,7 +21,7 @@
                 id="srjc_tag"
                 name="srjc_tag"
                 value="{{ old('srjc_tag') }}"
-                autofocus="autofocus"
+                @if(!session()->get('device_not_found')) autofocus="autofocus" @endif
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
         @error('srjc_tag')
           <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
