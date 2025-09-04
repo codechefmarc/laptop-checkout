@@ -26,7 +26,7 @@
             Notes
           </th>
           @auth
-            @if(auth()->user()->canEdit())
+            @if(!auth()->user()->isReadOnly())
               <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Operations
               </th>
@@ -65,12 +65,14 @@
               <div class="text-sm text-gray-900">{{ $activity->notes }}</div>
             </td>
             @auth
-              @if(auth()->user()->canEdit())
+              @if(!auth()->user()->isReadOnly())
                 <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('activities.edit', $activity->id) }}">Edit Activity</a>
                   </div>
                 </td>
+              @endif
+              @if(auth()->user()->canEdit())
                 <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('devices.edit', $activity->device->id) }}">Edit Device</a>

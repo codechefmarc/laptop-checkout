@@ -55,7 +55,7 @@ class ActivityController extends Controller {
       if (Auth::user()->hasRole('student')) {
         return redirect()->back()
           ->withInput()
-          ->with('error', 'Device not found. Students cannot create new devices. Please contact staff for assistance.');
+          ->with('error', 'Device not found. Students cannot create new devices. Please contact ITC staff for assistance.');
       }
       if ($isCreatingDevice) {
         $device = Device::create([

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\AdminMiddleware;
+use App\Http\Middleware\CanAccessActivitiesMiddleware;
 use App\Http\Middleware\CanEditMiddleware;
 use App\Http\Middleware\IsStudentMiddleware;
 use Illuminate\Foundation\Application;
@@ -17,7 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
       $middleware->alias([
         'admin' => AdminMiddleware::class,
         'can.edit' => CanEditMiddleware::class,
-        'is.student' => IsStudentMiddleware::class,
+        'is.student' => CanAccessActivitiesMiddleware::class,
       ]);
   })
   ->withExceptions(function (Exceptions $exceptions): void {

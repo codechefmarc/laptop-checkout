@@ -35,12 +35,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 // Activities.
-Route::middleware(['auth', 'can.edit'])->group(function () {
+Route::middleware(['auth', 'is.student'])->group(function () {
   Route::controller(ActivityController::class)->group(function () {
     Route::get('/log', 'logActivity')->name('log');
     Route::post('/log', 'store');
     Route::patch('/{activity}', 'patch')->name('activities.patch');
     Route::get('/activity/edit/{activity}', 'edit')->name('activities.edit');
+  });
+});
+
+// Activities for admins and editors.
+Route::middleware(['auth', 'can.edit'])->group(function () {
+  Route::controller(ActivityController::class)->group(function () {
     Route::delete('/activity/delete/{activity}', 'delete')->name('activities.delete');
   });
 });
@@ -83,3 +89,4 @@ Route::middleware(['auth'])->group(function () {
 
 // Errors.
 Route::any('{catchall}', [PageController::class, 'notfound'])->where('catchall', '.*');
+
