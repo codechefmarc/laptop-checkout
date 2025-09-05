@@ -1,5 +1,5 @@
 @auth
-  @if(auth()->user()->canEdit())
+  @if(auth()->user()->canEdit() || auth()->user()->isStudent())
     <x-nav-link href="{{ route('log') }}" :active="request()->routeIs('log')">Log Activity</x-nav-link>
   @endif
 @endauth

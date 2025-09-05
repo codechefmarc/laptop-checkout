@@ -52,6 +52,11 @@ class ActivityController extends Controller {
     $device = Device::findBySrjcOrSerial($validated['srjc_tag'] ?? NULL, $validated['serial_number'] ?? NULL);
 
     if (!$device) {
+      if (Auth::user()->hasRole('student')) {
+        return redirect()->back()
+          ->withInput()
+          ->with('error', 'Device not found. Students cannot create new devices. Please contact ITC staff for assistance.');
+      }
       if ($isCreatingDevice) {
         $device = Device::create([
           'srjc_tag' => $validated['srjc_tag'] ?? NULL,

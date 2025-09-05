@@ -79,6 +79,13 @@ class User extends Authenticatable {
   }
 
   /**
+   * Test if the user is a student.
+   */
+  public function isStudent(): bool {
+    return $this->hasRole('student');
+  }
+
+  /**
    * Tests if the user is read only.
    */
   public function isReadOnly(): bool {

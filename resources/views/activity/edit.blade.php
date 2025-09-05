@@ -40,6 +40,7 @@
         <button type="submit" class="ml-3 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
         <a href="/" class="text-sm/6 font-semibold text-gray-900 cursor-pointer">Cancel</a>
       </div>
+      @if(auth()->user()->canEdit())
       <div class="flex flex-col gap-3">
         <div class="flex-col items-center">
           <button
@@ -49,6 +50,7 @@
           >Delete Activity</button>
         </div>
       </div>
+      @endif
     </div>
   </div>
 </form>

@@ -15,7 +15,10 @@
   <body class="h-full">
 
     <div class="min-h-full">
-    <div class="bg-gray-600 text-white flex justify-end">
+    <div class="bg-gray-600 {{ env('APP_ENV') === 'local' ? 'bg-yellow-600' : '' }} text-white flex justify-end items-center">
+      @if(env('APP_ENV') === 'local')
+        <p class="mr-auto ml-3">DEVELOPMENT</p>
+      @endif
       <x-nav-auth/>
     </div>
     <nav class="bg-white-800">
