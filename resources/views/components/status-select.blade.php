@@ -9,7 +9,7 @@
     <span class="text-red-500 text-sm">*</span>
   @endif
 </p>
-<div class="sm:flex gap-8">
+<div class="sm:flex gap-5 justify-between">
 
   @if($search)
   <div>
