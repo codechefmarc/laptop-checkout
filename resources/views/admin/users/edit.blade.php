@@ -3,7 +3,11 @@
   Edit User
 </x-slot:heading>
 
-<form method="POST" action="{{ route('admin.users.update', $user) }}">
+<form method="POST" action="{{
+  request()->routeIs('profile.edit')
+    ? route('profile.update')
+    : route('admin.users.update', $user)
+}}">
   @csrf
   @method('PUT')
 
@@ -54,20 +58,28 @@
         <div class="">
           <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-red-500 text-sm">*</span></label>
           <div class="mt-2">
-            <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
+            <div class="
+              flex items-center rounded-md bg-white outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600
+            ">
               <input
                 id="email"
                 type="email"
                 name="email"
                 required
                 value="{{ old('email', $user->email) }}"
-                class="block min-w-0 grow py-1.5 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6" />
+                @if(!Auth::user()->isAdmin()) readonly @endif
+                class="
+                  block min-w-0 grow py-1.5 pl-3 pr-3 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm/6
+                 read-only:bg-gray-300 read-only:cursor-not-allowed
+                " />
             </div>
             @error('email')
               <p class="text-xs text-red-500 font-semibold mt-1">{{ $message }}</p>
             @enderror
           </div>
         </div>
+
+        @if($user->isAdmin())
 
         <!-- Role -->
         <div class="">
@@ -91,6 +103,7 @@
             @enderror
           </div>
         </div>
+        @endif
 
         <!-- Password Section -->
         <div class="border-t border-gray-200 pt-6 mt-6">
@@ -116,7 +129,7 @@
           </div>
 
           <!-- Confirm New Password -->
-          <div class="">
+          <div class="mt-4">
             <label for="password_confirmation" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
             <div class="mt-2">
               <div class="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-indigo-600">
@@ -137,7 +150,7 @@
     <div class="mt-6 sm:flex max-w-2xl items-center justify-between">
       <div class="flex items-center gap-x-6 justify-self-end">
         <button type="submit" class="ml-3 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Update</button>
-        <a href="{{ route('admin.users.index') }}" class="text-sm/6 font-semibold text-gray-900 cursor-pointer">Cancel</a>
+        <a href="{{ Auth::user()->isAdmin() ? route('admin.users.index') : route('welcome') }}" class="text-sm/6 font-semibold text-gray-900 cursor-pointer">Cancel</a>
       </div>
 
       @if($user->id !== auth()->id())

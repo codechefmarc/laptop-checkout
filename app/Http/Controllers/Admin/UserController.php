@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
  * Provides user methods.
  */
 class UserController extends Controller {
+  use AuthorizesRequests;
 
   /**
    * Shows all users.
@@ -65,16 +67,22 @@ class UserController extends Controller {
    * Update existing user.
    */
   public function update(Request $request, User $user) {
+
+    $this->authorize('edit-user', $user);
+
     $rules = [
       'first_name' => 'required|string|max:255',
       'last_name' => 'required|string|max:255',
       'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-      'role_id' => 'required|exists:roles,id',
     ];
 
     // Only validate password if it's provided.
     if ($request->filled('password')) {
       $rules['password'] = 'required|string|min:8|confirmed';
+    }
+
+    if (Auth::user()->is_admin) {
+      $rules['role_id'] = 'required|exists:roles,id';
     }
 
     $request->validate($rules);
@@ -83,7 +91,6 @@ class UserController extends Controller {
       'first_name' => $request->first_name,
       'last_name' => $request->last_name,
       'email' => $request->email,
-      'role_id' => $request->role_id,
     ];
 
     // Only update password if provided.
@@ -91,9 +98,19 @@ class UserController extends Controller {
       $updateData['password'] = Hash::make($request->password);
     }
 
+    if (Auth::user()->is_admin) {
+      $updateData['role_id'] = $request->role_id;
+    }
+
     $user->update($updateData);
 
-    return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
+    // Different redirects based on who's updating.
+    if (Auth::user()->is_admin && Auth::id() !== $user->id) {
+      return redirect()->route('admin.users.index')->with('success', 'User updated successfully!');
+    }
+    else {
+      return redirect()->route('profile.edit')->with('success', 'Profile updated successfully!');
+    }
   }
 
   /**
@@ -119,6 +136,21 @@ class UserController extends Controller {
     $user->delete();
 
     return redirect()->route('admin.users.index')->with('success', 'User deleted successfully!');
+  }
+
+  /**
+   * Edit profile form for the authenticated user.
+   */
+  public function editProfile() {
+    $user = Auth::user();
+    return view('admin.users.edit', compact('user'));
+  }
+
+  /**
+   * Update profile for the authenticated user.
+   */
+  public function updateProfile(Request $request) {
+    return $this->update($request, Auth::user());
   }
 
 }

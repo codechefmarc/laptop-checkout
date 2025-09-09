@@ -15,7 +15,7 @@
   <body class="h-full">
 
     <div class="min-h-full">
-    <div class="bg-gray-600 {{ env('APP_ENV') === 'local' ? 'bg-yellow-600' : '' }} text-white flex justify-end items-center">
+    <div class="bg-gray-600 pt-1 pb-1 {{ env('APP_ENV') === 'local' ? 'bg-yellow-600' : '' }} text-white flex justify-end items-center">
       @if(env('APP_ENV') === 'local')
         <p class="mr-auto ml-3">DEVELOPMENT</p>
       @endif

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 /**
@@ -20,7 +21,9 @@ class AppServiceProvider extends ServiceProvider {
    * Bootstrap any application services.
    */
   public function boot(): void {
-
+    Gate::define('edit-user', function ($currentUser, $targetUser) {
+        return $currentUser->is_admin || $currentUser->id === $targetUser->id;
+    });
   }
 
 }

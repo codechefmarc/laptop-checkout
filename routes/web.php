@@ -22,7 +22,7 @@ Route::get('/', function () {
 
 Route::get('/it/laptop-checkout', function () {
     return view('welcome');
-});
+})->name('welcome');
 
 // Authentication.
 Route::get('login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -32,6 +32,12 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 // Admin users.
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
   Route::resource('users', UserController::class)->except(['show']);
+});
+
+// User profile - users can edit their own profile.
+Route::middleware(['auth'])->group(function () {
+  Route::get('/profile', [UserController::class, 'editProfile'])->name('profile.edit');
+  Route::put('/profile', [UserController::class, 'updateProfile'])->name('profile.update');
 });
 
 // Activities.
