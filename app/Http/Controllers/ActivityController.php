@@ -83,6 +83,25 @@ class ActivityController extends Controller {
       session()->forget(['device_not_found', 'device_data']);
     }
 
+    // Check for duplicate activity (same status as current).
+    $deviceCurrentActivity = $device->activities()->latest()->first();
+    if (
+      $deviceCurrentActivity
+      && $deviceCurrentActivity->status_id == $validated['status_id']
+      && !request('force_duplicate')
+      ) {
+      return redirect()->back()
+        ->withInput()
+        ->with('duplicate_activity', [
+          'status_id' => $validated['status_id'],
+          'status_name' => Status::find($validated['status_id'])->status_name,
+          'tailwind_class' => Status::find($validated['status_id'])->tailwind_class,
+          'srjc_tag' => $validated['srjc_tag'] ?? NULL,
+          'serial_number' => $validated['serial_number'],
+          'notes' => $validated['notes'] ?? NULL,
+        ]);
+    }
+
     Activity::create([
       'device_id' => $device->id,
       'status_id' => $validated['status_id'],

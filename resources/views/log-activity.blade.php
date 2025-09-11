@@ -10,5 +10,6 @@
   </x-activity-list>
 
   <x-device-modal />
+  <x-duplicate-activity-modal />
 
 </x-layout>
