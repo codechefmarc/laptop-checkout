@@ -3,7 +3,7 @@
     <div class="bg-white rounded-lg shadow-xl max-w-md max-h-[90vh] overflow-y-auto">
       <div class="px-6 py-4 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900">Duplicate Activity Detected</h3>
-        <p class="text-sm text-gray-600 mt-1">This device is currently set to <strong class="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-neutral-50 {{ session('duplicate_activity.tailwind_class') }}">{{ session('duplicate_activity.status_name') }}</strong> Do you want to add another activity with this same status?</p>
+        <p class="text-sm text-gray-600 mt-1">This device is currently set to <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full text-neutral-50 {{ session('duplicate_activity.tailwind_class') }}">{{ session('duplicate_activity.status_name') }}</span> as of {{ session('duplicate_activity.activity_date') }}. Do you want to add another activity with this same status?</p>
       </div>
       <form method="POST" action="{{ route('log') }}">
         @csrf

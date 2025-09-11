@@ -11,6 +11,7 @@
       @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif
 
+    <script src="https://kit.fontawesome.com/d6c74f4872.js" crossorigin="anonymous"></script>
   </head>
   <body class="h-full">
 

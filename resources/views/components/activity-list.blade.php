@@ -25,13 +25,9 @@
           <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
             Notes
           </th>
-          @auth
-            @if(!auth()->user()->isReadOnly())
-              <th colspan="2" class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Operations
-              </th>
-            @endif
-          @endauth
+          <th class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+            Operations
+          </th>
         </tr>
       </thead>
 
@@ -64,22 +60,23 @@
             <td class="px-6 py-4">
               <div class="text-sm text-gray-900">{{ $activity->notes }}</div>
             </td>
+            <td class="px-6 py-4 flex gap-1 justify-around">
             @auth
               @if(!auth()->user()->isReadOnly())
-                <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('activities.edit', $activity->id) }}">Edit Activity</a>
+                    <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Edit activity" href="{{ route('activities.edit', $activity->id) }}"><i class="fa-solid fa-pen-to-square"></i></a>
                   </div>
-                </td>
               @endif
               @if(auth()->user()->canEdit())
-                <td class="px-6 py-4">
                   <div class="text-center text-sm text-gray-900">
-                    <a class="text-blue-500 font-semibold hover:text-gray-800" href="{{ route('devices.edit', $activity->device->id) }}">Edit Device</a>
+                    <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Edit device" href="{{ route('devices.edit', $activity->device->id) }}"><i class="fa-solid fa-laptop-file"></i></a>
                   </div>
-                </td>
               @endif
             @endauth
+              <div class="text-center text-sm text-gray-900">
+                <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Show all activity for this device" href="{{ route('search', ['srjc_tag' => $activity->device->srjc_tag, 'serial_number' => $activity->device->serial_number, 'status_id' => 'any']) }}"><i class="fa-solid fa-magnifying-glass"></i></a>
+              </div>
+            </td>
           </tr>
         @empty
           <tr><td colspan="6" class="text-center py-8">No activities found</td></tr>

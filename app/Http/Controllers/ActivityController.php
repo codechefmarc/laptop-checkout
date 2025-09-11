@@ -94,6 +94,7 @@ class ActivityController extends Controller {
         ->withInput()
         ->with('duplicate_activity', [
           'status_id' => $validated['status_id'],
+          'activity_date' => $deviceCurrentActivity->created_at->format('m/d/Y'),
           'status_name' => Status::find($validated['status_id'])->status_name,
           'tailwind_class' => Status::find($validated['status_id'])->tailwind_class,
           'srjc_tag' => $validated['srjc_tag'] ?? NULL,
