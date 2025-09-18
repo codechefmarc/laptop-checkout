@@ -4,7 +4,7 @@
   </x-slot:heading>
 
 
-<div class="flex justify-between max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
+<div class="md:flex justify-between max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   <div>
     <h3 class="font-bold text-xl text-gray-600 mb-3">Devices</h3>
     <ul>

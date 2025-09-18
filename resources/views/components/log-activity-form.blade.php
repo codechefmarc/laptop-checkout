@@ -1,11 +1,12 @@
 <form method="POST" action="{{ route('log') }}" class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   @csrf
   <div class="space-y-6">
+  <div class="md:flex justify-between gap-4">
     <div>
         <x-status-select />
     </div>
 
-    <div>
+    <div class="w-full">
       <label for="notes" class="block text-sm font-medium text-gray-700 mb-2">Optional Notes</label>
       <input type="text"
         id="notes"
@@ -13,7 +14,7 @@
         value="{{ old('notes') }}"
         class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
     </div>
-
+  </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label for="srjc_tag" class="block text-sm font-medium text-gray-700 mb-2">SRJC Tag</label>

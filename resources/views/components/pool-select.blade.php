@@ -19,7 +19,7 @@
     >
 
     @if($search)
-      <option value="any">-- Any --</option>
+      <option value="any">&mdash; Any &mdash;</option>
     @endif
 
       @foreach ($pools as $pool)
