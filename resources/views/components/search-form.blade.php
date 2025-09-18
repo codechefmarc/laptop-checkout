@@ -1,23 +1,24 @@
 <form method="GET" action="{{ route('search') }}" class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   <div class="space-y-6">
-    <div>
-        <x-status-select :search="TRUE" />
+    <div class="md:flex gap-5 items-center">
+      <div>
+          <x-status-select :search="TRUE" />
+      </div>
+
+      @php
+        $current_status_checked = request('current_status_only') ? 'checked' : '';
+      @endphp
+
+      <div>
+        <input
+        type="checkbox"
+        name="current_status_only"
+        id="current_status_only"
+        {{ $current_status_checked }}
+        >
+        <label for="current_status_only">Show current status only</label>
+      </div>
     </div>
-
-    @php
-      $current_status_checked = request('current_status_only') ? 'checked' : '';
-    @endphp
-
-    <div>
-      <input
-      type="checkbox"
-      name="current_status_only"
-      id="current_status_only"
-      {{ $current_status_checked }}
-      >
-      <label for="current_status_only">Show current status only</label>
-    </div>
-
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
         <label for="srjc_tag" class="block text-sm font-medium text-gray-700 mb-2">SRJC Tag</label>
@@ -64,9 +65,7 @@
         <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
         <div class="relative max-w-sm">
           <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-            </svg>
+            <i class="fa-solid fa-calendar text-gray-500 dark:text-gray-400"></i>
           </div>
           <input
             type="text"
