@@ -80,7 +80,7 @@
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      window.location.href = '/';
+      window.location.href = "{{ route('log') }}";
     }
   });
   </script>
