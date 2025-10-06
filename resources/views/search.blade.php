@@ -7,7 +7,7 @@
 
   @if($activities !== null)
     <x-activity-list :activities="$activities">
-      Activities ({{ $activities->total() }})
+      Activities
     </x-activity-list>
   @endif
 
