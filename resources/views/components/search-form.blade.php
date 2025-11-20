@@ -6,14 +6,20 @@
       </div>
 
       @php
-        $current_status_checked = request('current_status_only') ? 'checked' : '';
+        if (request()->has('current_status_only')) {
+          $current_status_checked = request('current_status_only') == 'on' ? 'checked' : '';
+        } else {
+          $current_status_checked = 'checked';
+        }
       @endphp
 
       <div>
+        <input type="hidden" name="current_status_only" value="off">
         <input
         type="checkbox"
         name="current_status_only"
         id="current_status_only"
+        value="on"
         {{ $current_status_checked }}
         >
         <label for="current_status_only">Show current status only</label>

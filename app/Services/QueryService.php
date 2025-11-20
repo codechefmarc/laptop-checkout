@@ -85,7 +85,7 @@ class QueryService {
       });
     }
 
-    if ($request->has('current_status_only')) {
+    if ($request->has('current_status_only') && $request->current_status_only == 'on') {
       $query->whereIn(DB::raw('(device_id, created_at)'), function ($subquery) {
         $subquery->select('device_id', DB::raw('MAX(created_at)'))
           ->from('activities')
