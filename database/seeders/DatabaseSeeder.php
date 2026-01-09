@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder {
       'first_name' => 'Test',
       'last_name' => 'User',
       'email' => 'test@example.com',
-      'role_id' => 3,
+      'role_id' => 1,
     ]);
     $this->call(DeviceSeeder::class);
     $this->call(StatusSeeder::class);
