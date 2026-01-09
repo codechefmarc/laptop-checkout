@@ -1,4 +1,4 @@
-<hr class="h-px my-8 bg-gray-300 border-0 dark:bg-gray-700">
+<hr class="h-px my-8 bg-gray-300 border-0">
 
 <div class="bg-white shadow-lg rounded-lg overflow-hidden">
   <div class="bg-gray-50 px-6 py-4 border-b border-gray-200">

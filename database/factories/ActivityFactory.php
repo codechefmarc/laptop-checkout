@@ -16,9 +16,16 @@ class ActivityFactory extends Factory {
   /**
    * A randomly selected pool of devices.
    *
-   * @var devicePool
+   * @var array|null
    */
   private static $devicePool = NULL;
+
+  /**
+   * Current index for cycling through devices.
+   *
+   * @var int
+   */
+  private static $currentIndex = 0;
 
   /**
    * Define the model's default state.
@@ -30,11 +37,26 @@ class ActivityFactory extends Factory {
 
     if (self::$devicePool === NULL) {
       // Get random devices to reuse frequently.
-      self::$devicePool = Device::inRandomOrder()->take(8)->pluck('id')->toArray();
+      self::$devicePool = Device::inRandomOrder()->take(100)->pluck('id')->toArray();
+      // Shuffle the pool for randomness.
+      shuffle(self::$devicePool);
     }
 
+    $poolSize = count(self::$devicePool);
+
+    // First pass: ensure every device gets at least one activity.
+    if (self::$currentIndex < $poolSize) {
+      $deviceId = self::$devicePool[self::$currentIndex];
+    }
+    else {
+      // After first pass: random distribution for remaining activities.
+      $deviceId = fake()->randomElement(self::$devicePool);
+    }
+
+    self::$currentIndex++;
+
     return [
-      'device_id' => fake()->randomElement(self::$devicePool),
+      'device_id' => $deviceId,
       'status_id' => Status::inRandomOrder()->first()->id,
       'username' => fake()->firstName() . ' ' . fake()->lastName(),
       'notes' => fake()->optional(0.3)->sentence(),

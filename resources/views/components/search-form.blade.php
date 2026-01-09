@@ -1,8 +1,40 @@
+@props(['statusFilterInfo' => null])
+
 <form method="GET" action="{{ route('search') }}" class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-md">
   <div class="space-y-6">
     <div class="md:flex gap-5 items-center">
       <div>
           <x-status-select :search="TRUE" />
+
+          @php
+            $statusId = request('status_id');
+            $isExclusion = str_starts_with($statusId ?? '', 'not_');
+            $isMultiple = str_contains($statusId ?? '', ',');
+            $showEmptyModels = request('show_empty_models') == 'true';
+          @endphp
+
+          {{-- Status filter indicator --}}
+          @if(isset($statusFilterInfo) && $statusFilterInfo)
+            @if($statusFilterInfo['type'] === 'exclusion')
+              <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-orange-100 text-orange-800 text-sm rounded-full">
+                <i class="fa-solid fa-filter"></i>
+                <span>Excluding: {{ $statusFilterInfo['name'] }}</span>
+              </div>
+            @elseif($statusFilterInfo['type'] === 'multiple')
+              <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
+                <i class="fa-solid fa-filter"></i>
+                <span>Statuses: {{ implode(', ', $statusFilterInfo['names']) }}</span>
+              </div>
+            @endif
+          @endif
+
+          {{-- Empty models filter indicator --}}
+          @if($showEmptyModels)
+            <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full">
+              <i class="fa-solid fa-filter"></i>
+              <span>Showing only devices without model numbers</span>
+            </div>
+          @endif
       </div>
 
       @php
@@ -71,14 +103,14 @@
         <label for="date_range" class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
         <div class="relative max-w-sm">
           <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-            <i class="fa-solid fa-calendar text-gray-500 dark:text-gray-400"></i>
+            <i class="fa-solid fa-calendar text-gray-500"></i>
           </div>
           <input
             type="text"
             id="date_range"
             name="date_range"
             value="{{ request('date_range') }}"
-            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5"
            />
         </div>
         <small class="ml-1 block text-gray-500">To select one date, click that date twice.</small>

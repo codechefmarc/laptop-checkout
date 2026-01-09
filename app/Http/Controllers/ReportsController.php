@@ -21,8 +21,10 @@ class ReportsController extends Controller {
     $activities = NULL;
     $devices = NULL;
     $report_title = NULL;
-    $device_count = Device::count();
-    $inactive_count = Device::whereDoesntHave('activities')->count();
+    $active_device_count = $this->getDeviceCounts();
+    $surplus_device_count = $this->getDeviceCounts(TRUE);
+    $inactive_device_count = Device::whereDoesntHave('activities')->count();
+    $surplusId = Status::getIdByName('Surplus');
 
     if (isset($request['report'])) {
 
@@ -33,28 +35,50 @@ class ReportsController extends Controller {
           $devices->appends(['report' => 'all_devices']);
           break;
 
+        case 'active_devices':
+          $report_title = 'Active Devices (' . $active_device_count . ")";
+          $devices = Device::select('devices.*')
+            ->join('activities', 'devices.id', '=', 'activities.device_id')
+            ->join(DB::raw('(
+              SELECT device_id, MAX(created_at) as max_date
+              FROM activities
+              GROUP BY device_id
+            ) as latest'),
+            function ($join) {
+              $join->on('activities.device_id', '=', 'latest.device_id')
+                ->on('activities.created_at', '=', 'latest.max_date');
+            })
+            ->where('activities.status_id', '!=', $surplusId)
+            ->distinct()
+            ->orderBy('devices.srjc_tag')
+            ->paginate(20);
+          $devices->appends(['report' => 'active_devices']);
+          break;
+
+        case 'surplus_devices':
+          $report_title = 'Surplus Devices (' . $surplus_device_count . ")";
+          $devices = Device::select('devices.*')
+            ->join('activities', 'devices.id', '=', 'activities.device_id')
+            ->join(DB::raw('(
+              SELECT device_id, MAX(created_at) as max_date
+              FROM activities
+              GROUP BY device_id
+            ) as latest'),
+            function ($join) {
+              $join->on('activities.device_id', '=', 'latest.device_id')
+                ->on('activities.created_at', '=', 'latest.max_date');
+            })
+            ->where('activities.status_id', $surplusId)
+            ->distinct()
+            ->orderBy('devices.srjc_tag')
+            ->paginate(20);
+          $devices->appends(['report' => 'surplus_devices']);
+          break;
+
         case 'inactive_devices':
           $report_title = 'Inactive Devices (' . Device::whereDoesntHave('activities')->count() . ")";
           $devices = Device::whereDoesntHave('activities')->orderBy('srjc_tag')->paginate(20);
           $devices->appends(['report' => 'inactive_devices']);
-          break;
-
-        case 'devices_by_pool':
-          if (isset($request['pool_id']) && is_numeric($request['pool_id'])) {
-            $pool = Pool::find($request['pool_id']);
-            if ($pool) {
-              $report_title = 'Devices in ' . $pool->name . ' (' . Device::where('pool_id', $pool->id)->count() . ")";
-              $devices = Device::where('pool_id', $pool->id)->orderBy('srjc_tag')->paginate(20);
-              $devices->appends(['report' => 'devices_by_pool', 'pool_id' => $pool->id]);
-            } else {
-              $report_title = 'Invalid Pool ID';
-              $devices = NULL;
-            }
-          } else {
-            $report_title = 'No Pool ID Specified';
-            $devices = NULL;
-          }
-
           break;
 
         default:
@@ -67,12 +91,48 @@ class ReportsController extends Controller {
       'activities' => $activities,
       'devices' => $devices,
       'report_title' => $report_title,
-      'device_count' => $device_count,
-      'inactive_count' => $inactive_count,
+      'active_device_count' => $active_device_count,
+      'surplus_device_count' => $surplus_device_count,
+      'total_device_count' => Device::count(),
       'status_counts' => $this->getCurrentStatus(),
       'pool_counts' => $this->getDeviceCountsByPool(),
       'pool_counts_current' => $this->getCurrentStatusByPool(),
+      'active_device_model_counts' => $this->getDeviceCountsByModel('not_surplus'),
+      'surplus_device_model_counts' => $this->getDeviceCountsByModel('surplus'),
+      'inactive_device_count' => $inactive_device_count,
+      'surplus_status_id' => Status::getIdByName('Surplus'),
     ]);
+  }
+
+  /**
+   * Gets device counts.
+   */
+  private function getDeviceCounts($surplus = FALSE) {
+    $surplusId = Status::getIdByName('Surplus');
+
+    $deviceCounts = Device::select('devices.model_number', DB::raw('count(DISTINCT devices.id) as device_count'))
+      ->join('activities', 'devices.id', '=', 'activities.device_id')
+      ->join(DB::raw('(
+        SELECT device_id, MAX(created_at) as max_date
+        FROM activities
+        GROUP BY device_id
+      ) as latest'),
+      function ($join) {
+        $join->on('activities.device_id', '=', 'latest.device_id')
+          ->on('activities.created_at', '=', 'latest.max_date');
+      });
+
+    if ($surplus) {
+      $deviceCounts->where('activities.status_id', $surplusId);
+    }
+    else {
+      $deviceCounts->where('activities.status_id', '!=', $surplusId);
+    }
+
+    $count = $deviceCounts->distinct()
+      ->count();
+
+    return $count;
   }
 
   /**
@@ -159,6 +219,53 @@ class ReportsController extends Controller {
       ->values();
 
     return $poolCounts;
+  }
+
+  /**
+   * Gets device counts by model number filtered by status.
+   *
+   * @param string $filter
+   *   Either 'surplus', 'not_surplus', or 'all'.
+   *
+   * @return \Illuminate\Support\Collection
+   *   A collection of objects with model_number and device_count properties.
+   */
+  private function getDeviceCountsByModel($filter = 'all') {
+    $query = Device::select('devices.model_number', DB::raw('count(DISTINCT devices.id) as device_count'))
+      ->join('activities', 'devices.id', '=', 'activities.device_id')
+      ->join(DB::raw('(
+        SELECT device_id, MAX(created_at) as max_date
+        FROM activities
+        GROUP BY device_id
+      ) as latest'),
+      function ($join) {
+        $join->on('activities.device_id', '=', 'latest.device_id')
+          ->on('activities.created_at', '=', 'latest.max_date');
+      });
+
+    // Filter by status.
+    $surplusId = Status::getIdByName('Surplus');
+
+    if ($filter === 'surplus' && $surplusId) {
+      $query->where('activities.status_id', $surplusId);
+    }
+    elseif ($filter === 'not_surplus' && $surplusId) {
+      $query->where('activities.status_id', '!=', $surplusId);
+    }
+
+    $modelCounts = $query
+      ->groupBy('devices.model_number')
+      ->get()
+      ->map(function ($item) {
+        return (object) [
+          'model_number' => $item->model_number ?? 'Unknown Model',
+          'device_count' => $item->device_count,
+        ];
+      })
+      ->sortByDesc('device_count')
+      ->values();
+
+    return $modelCounts;
   }
 
 }

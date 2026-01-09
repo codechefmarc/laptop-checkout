@@ -16,13 +16,13 @@ return new class extends Migration {
   public function up(): void {
     // First, get the IDs for both statuses.
     $mahoneyStatus = DB::table('statuses')->where('status_name', 'Mahoney')->first();
-    $libraryStatus = DB::table('statuses')->where('status_name', 'Library')->first();
+    $doyleStatus = DB::table('statuses')->where('status_name', 'Doyle')->first();
 
-    // Migrate all activities from Mahoney to Library.
-    if ($mahoneyStatus && $libraryStatus) {
+    // Migrate all activities from Mahoney and Doyle to Library.
+    if ($mahoneyStatus && $doyleStatus) {
       DB::table('activities')
         ->where('status_id', $mahoneyStatus->id)
-        ->update(['status_id' => $libraryStatus->id]);
+        ->update(['status_id' => $doyleStatus->id]);
     }
 
     // Delete the Mahoney status.

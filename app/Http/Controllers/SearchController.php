@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Status;
 use App\Services\QueryService;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,49 @@ class SearchController extends Controller {
       $devices->appends($request->query());
     }
 
-    return view('search', compact('activities', 'devices'));
+    // Prepare status filter info for display.
+    $statusFilterInfo = $this->getStatusFilterInfo($request);
+
+    return view('search', compact('activities', 'devices', 'statusFilterInfo'));
+  }
+
+  /**
+   * Get status filter information for display.
+   */
+  private function getStatusFilterInfo(Request $request) {
+    $statusId = $request->input('status_id');
+
+    if (!$statusId || $statusId === 'any') {
+      return NULL;
+    }
+
+    // Check for exclusion filter.
+    if (str_starts_with($statusId, 'not_')) {
+      $statusName = ucfirst(substr($statusId, 4));
+      return [
+        'type' => 'exclusion',
+        'name' => $statusName,
+      ];
+    }
+
+    // Check for multiple statuses.
+    if (str_contains($statusId, ',')) {
+      $statusIds = array_map('trim', explode(',', $statusId));
+      $statusNames = [];
+      foreach ($statusIds as $id) {
+        $name = Status::getNameById((int) $id);
+        if ($name) {
+          $statusNames[] = $name;
+        }
+      }
+      return [
+        'type' => 'multiple',
+        'names' => $statusNames,
+        'count' => count($statusNames),
+      ];
+    }
+
+    return NULL;
   }
 
 }

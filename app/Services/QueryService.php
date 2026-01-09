@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Activity;
 use App\Models\Device;
+use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -22,7 +23,24 @@ class QueryService {
 
     // Handle Status Filter.
     if ($request->filled('status_id') && $request->status_id !== 'any') {
-      $query->where('status_id', $request->status_id);
+      // Check if it's an exclusion filter (starts with 'not_')
+      if (str_starts_with($request->status_id, 'not_')) {
+        // Remove 'not_' prefix.
+        $statusName = substr($request->status_id, 4);
+        $excludeStatusId = Status::getIdByName(ucfirst($statusName));
+        if ($excludeStatusId) {
+          $query->where('status_id', '!=', $excludeStatusId);
+        }
+      }
+      // Check if it's multiple statuses (comma-separated)
+      elseif (str_contains($request->status_id, ',')) {
+        $statusIds = array_map('trim', explode(',', $request->status_id));
+        $query->whereIn('status_id', $statusIds);
+      }
+      // Single status ID
+      else {
+        $query->where('status_id', $request->status_id);
+      }
     }
 
     // Handle SRJC Filter.
@@ -43,6 +61,14 @@ class QueryService {
     if ($request->filled('model_number')) {
       $query->whereHas('device', function ($q) use ($request) {
         $q->where('model_number', 'LIKE', '%' . $request->model_number . '%');
+      });
+    }
+
+    // Handle empty/null model number search.
+    if ($request->has('show_empty_models') && $request->show_empty_models == 'true') {
+      $query->whereHas('device', function ($q) {
+        $q->whereNull('model_number')
+          ->orWhere('model_number', '');
       });
     }
 
@@ -116,6 +142,14 @@ class QueryService {
     // Handle Model Number.
     if ($request->filled('model_number')) {
       $query->where('model_number', 'LIKE', '%' . $request->model_number . '%');
+    }
+
+    // Handle empty/null model number search.
+    if ($request->has('show_empty_models') && $request->show_empty_models == 'true') {
+      $query->where(function ($q) {
+        $q->whereNull('model_number')
+          ->orWhere('model_number', '');
+      });
     }
 
     // Handle Pool Filter.
