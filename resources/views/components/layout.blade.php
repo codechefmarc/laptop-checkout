@@ -12,6 +12,8 @@
     @endif
 
     <script src="https://kit.fontawesome.com/d6c74f4872.js" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
   </head>
   <body class="h-full">
 

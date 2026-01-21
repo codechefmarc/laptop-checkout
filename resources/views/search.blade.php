@@ -3,7 +3,7 @@
     Search
   </x-slot:heading>
 
-  <x-search-form :statusFilterInfo="$statusFilterInfo"/>
+  <x-search-form :statusFilterInfo="$statusFilterInfo" :poolName="$poolName"/>
 
   @if($activities !== null)
     <x-activity-list :activities="$activities">

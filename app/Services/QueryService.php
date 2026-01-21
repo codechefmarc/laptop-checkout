@@ -118,6 +118,12 @@ class QueryService {
           ->groupBy('device_id');
       });
     }
+
+    // Handle notes Filter.
+    if ($request->filled('notes')) {
+      $query->where('notes', 'LIKE', '%' . $request->notes . '%');
+    }
+
     return $query;
   }
 

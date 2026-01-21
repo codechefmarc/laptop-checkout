@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Pool;
 use App\Models\Status;
 use App\Services\QueryService;
 use Illuminate\Http\Request;
@@ -24,6 +25,7 @@ class SearchController extends Controller {
         'serial_number',
         'model_number',
         'pool_id',
+        'notes',
       ]
     );
 
@@ -31,7 +33,8 @@ class SearchController extends Controller {
     $hasDeviceSearchParams =
       $request->hasAny(['srjc_tag', 'serial_number', 'model_number', 'pool_id'])
       && $request->string('status_id') == 'any'
-      && !$request->filled('date_range');
+      && !$request->filled('date_range')
+      && $request->string('notes')->isEmpty();
 
     $activities = NULL;
 
@@ -51,8 +54,9 @@ class SearchController extends Controller {
 
     // Prepare status filter info for display.
     $statusFilterInfo = $this->getStatusFilterInfo($request);
+    $poolName = $this->getPoolName($request);
 
-    return view('search', compact('activities', 'devices', 'statusFilterInfo'));
+    return view('search', compact('activities', 'devices', 'statusFilterInfo', 'poolName'));
   }
 
   /**
@@ -91,7 +95,30 @@ class SearchController extends Controller {
       ];
     }
 
+    // Single status.
+    $statusName = Status::getNameById((int) $statusId);
+    if ($statusName) {
+      return [
+        'type' => 'single',
+        'name' => $statusName,
+      ];
+    }
+
     return NULL;
+  }
+
+  /**
+   * Get pool name for display.
+   */
+  private function getPoolName(Request $request) {
+    $poolId = $request->input('pool_id');
+
+    if (!$poolId || $poolId === 'any') {
+      return NULL;
+    }
+
+    $pool = Pool::find((int) $poolId);
+    return $pool ? $pool->name : NULL;
   }
 
 }
