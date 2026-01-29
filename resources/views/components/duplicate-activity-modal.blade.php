@@ -30,9 +30,13 @@
 
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
       window.location.href = "{{ route('log') }}";
     }
-  });
+  }, true); // Use capture phase (true) to catch event before extensions.
   </script>
 @endif

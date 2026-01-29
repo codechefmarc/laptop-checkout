@@ -17,6 +17,10 @@ class SearchController extends Controller {
    */
   public function search(Request $request) {
 
+    if ($request->input('exclude_surplus') === 'on') {
+      $request->merge(['status_id' => 'not_surplus']);
+    }
+
     $hasSearchParams = $request->hasAny(
       [
         'status_id',

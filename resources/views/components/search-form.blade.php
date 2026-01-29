@@ -2,13 +2,29 @@
 
 @php
   // Check if this is a search results page (any search parameters present)
-  $hasSearchParams = request()->hasAny(['status_id', 'srjc_tag', 'serial_number', 'model_number', 'date_range', 'pool_id']);
+  $hasSearchParams = request()->hasAny(['status_id', 'srjc_tag', 'serial_number', 'model_number', 'date_range', 'pool_id', 'notes']);
   $isCollapsed = $hasSearchParams; // Auto-collapse if search was performed
 @endphp
 
 <div x-data="{
+  pinned: localStorage.getItem('searchFormPinned') === 'true',
   collapsed: {{ $isCollapsed ? 'true' : 'false' }},
-  toggle() { this.collapsed = !this.collapsed }
+  init() {
+    // If pinned, never collapse
+    if (this.pinned) {
+      this.collapsed = false;
+    }
+  },
+  toggle() {
+    this.collapsed = !this.collapsed;
+  },
+  togglePin() {
+    this.pinned = !this.pinned;
+    localStorage.setItem('searchFormPinned', this.pinned);
+    if (this.pinned) {
+      this.collapsed = false;
+    }
+  }
 }"
 class="max-w-2xl mx-auto">
 
@@ -50,10 +66,10 @@ class="max-w-2xl mx-auto">
         @endif
 
         @if(request('show_empty_models') == 'true')
-              <div class="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-md">
-                <span>Showing only devices without model numbers</span>
-              </div>
-            @endif
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-md">
+            <span>Showing only devices without model numbers</span>
+          </div>
+        @endif
 
         @if(request('srjc_tag'))
           <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-sm rounded-md">
@@ -85,18 +101,34 @@ class="max-w-2xl mx-auto">
           </span>
         @endif
 
+        @if(request('notes'))
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-sm rounded-md">
+            <strong>Notes:</strong> {{ Str::limit(request('notes'), 30) }}
+          </span>
+        @endif
+
         @if(!$hasSearchParams)
           <span class="text-sm text-gray-500 italic">No filters applied</span>
         @endif
       </div>
       <div class="flex items-center justify-end gap-4 w-full">
         <a href="{{ route('search') }}" class="text-sm text-gray-900 cursor-pointer">Reset</a>
+
         <button @click="toggle()"
                 type="button"
                 class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition">
           <i class="fa-solid fa-chevron-down"></i>
           Modify Search
         </button>
+
+        <button @click="togglePin()"
+                type="button"
+                :class="pinned ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition"
+                :title="pinned ? 'Unpin search form' : 'Pin search form open'">
+          <i class="fa-solid fa-thumbtack"></i>
+        </button>
+
       </div>
     </div>
   </div>
@@ -112,19 +144,75 @@ class="max-w-2xl mx-auto">
 
     {{-- Collapse button (only show after initial search) --}}
     @if($hasSearchParams)
-      <div class="flex justify-end mb-4">
+      <div class="flex justify-end items-center gap-2 mb-4">
         <button @click="toggle()"
                 type="button"
+                x-show="!pinned"
                 class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-gray-700 hover:bg-gray-100 rounded-md transition">
           <i class="fa-solid fa-chevron-up"></i>
           Collapse
+        </button>
+
+        <button @click="togglePin()"
+                type="button"
+                :class="pinned ? 'text-blue-600 bg-blue-50' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'"
+                class="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-md transition"
+                :title="pinned ? 'Unpin - allow auto-collapse' : 'Pin - keep form open'">
+          <i class="fa-solid fa-thumbtack"></i>
         </button>
 
       </div>
     @endif
 
     <div class="space-y-6">
-      <div class="md:flex gap-5 items-center">
+      <div class="md:flex gap-5 items-center" x-data="{
+        statusSelected: '{{ request('status_id') && request('status_id') != 'not_surplus' && request('status_id') != 'any' ? 'true' : 'false' }}' === 'true',
+        excludeSurplus: {{ request('status_id') == 'not_surplus' ? 'true' : 'false' }},
+        init() {
+          // Watch for status select changes
+          this.$nextTick(() => {
+            const statusSelect = document.querySelector('select[name=status_id]');
+            if (statusSelect) {
+              statusSelect.addEventListener('change', (e) => {
+                const val = e.target.value;
+                this.statusSelected = val !== 'any' && val !== 'not_surplus';
+                if (this.statusSelected) {
+                  this.excludeSurplus = false;
+                }
+              });
+
+              // Set initial disabled state
+              this.updateStatusSelectState();
+            }
+          });
+        },
+        updateStatusSelectState() {
+          const statusSelect = document.querySelector('select[name=status_id]');
+          if (statusSelect) {
+            if (this.excludeSurplus) {
+              statusSelect.disabled = true;
+              statusSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+              statusSelect.disabled = false;
+              statusSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+          }
+        },
+        toggleExcludeSurplus() {
+          const statusSelect = document.querySelector('select[name=status_id]');
+          if (statusSelect) {
+            if (this.excludeSurplus) {
+              statusSelect.value = 'not_surplus';
+              statusSelect.disabled = true;
+              statusSelect.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+              statusSelect.disabled = false;
+              statusSelect.value = 'any';
+              statusSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+          }
+        }
+      }">
         <div>
             <x-status-select :search="TRUE" />
         </div>
@@ -164,25 +252,46 @@ class="max-w-2xl mx-auto">
         </div>
 
       </div>
+
       @php
           if (request()->has('current_status_only')) {
             $current_status_checked = request('current_status_only') == 'on' ? 'checked' : '';
           } else {
             $current_status_checked = 'checked';
           }
+
+          $exclude_surplus_checked = request('status_id') == 'not_surplus' ? 'checked' : '';
         @endphp
 
-        <div>
-          <input type="hidden" name="current_status_only" value="off">
-          <input
-          type="checkbox"
-          name="current_status_only"
-          id="current_status_only"
-          value="on"
-          {{ $current_status_checked }}
-          >
-          <label for="current_status_only">Show current status only</label>
+        <div class="flex gap-4" x-data="{
+          statusSelected: '{{ request('status_id') && request('status_id') != 'not_surplus' && request('status_id') != 'any' ? 'true' : 'false' }}' === 'true',
+          excludeSurplus: {{ request('status_id') == 'not_surplus' ? 'true' : 'false' }}
+        }">
+          <div>
+            <input type="hidden" name="current_status_only" value="off">
+            <input
+            type="checkbox"
+            name="current_status_only"
+            id="current_status_only"
+            value="on"
+            {{ $current_status_checked }}
+            >
+            <label for="current_status_only">Show current status only</label>
+          </div>
+          <div>
+            <input
+            type="checkbox"
+            id="exclude_surplus"
+            name="exclude_surplus"
+            x-model="excludeSurplus"
+            @change="$dispatch('toggle-exclude-surplus')"
+            :disabled="statusSelected"
+            :class="statusSelected ? 'opacity-50 cursor-not-allowed' : ''"
+            >
+            <label for="exclude_surplus" :class="statusSelected ? 'opacity-50 cursor-not-allowed' : ''">Exclude surplus</label>
+          </div>
         </div>
+
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label for="srjc_tag" class="block text-sm font-medium text-gray-700 mb-2">SRJC Tag</label>
@@ -260,3 +369,32 @@ class="max-w-2xl mx-auto">
       <a href="{{ route('search') }}" class="ml-3 text-gray-900 cursor-pointer">Reset</a>
   </form>
 </div>
+<script>
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' || e.keyCode === 27) {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+
+      window.location.href = "{{ route('search') }}";
+    }
+  }, true); // Use capture phase (true) to catch event before extensions.
+
+  // Listen for the toggle event from the checkbox
+  document.addEventListener('toggle-exclude-surplus', function() {
+    const checkbox = document.getElementById('exclude_surplus');
+    const statusSelect = document.querySelector('select[name=status_id]');
+
+    if (statusSelect && checkbox) {
+      if (checkbox.checked) {
+        statusSelect.value = 'not_surplus';
+        statusSelect.disabled = true;
+        statusSelect.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        statusSelect.disabled = false;
+        statusSelect.value = 'any';
+        statusSelect.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+  });
+</script>
