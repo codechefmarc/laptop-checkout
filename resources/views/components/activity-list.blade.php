@@ -73,7 +73,7 @@
               @endif
             @endauth
               <div class="text-center text-sm text-gray-900">
-                <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Show all activity for this device" href="{{ route('search', ['srjc_tag' => $activity->device->srjc_tag, 'serial_number' => $activity->device->serial_number, 'status_id' => 'any']) }}"><i class="fa-solid fa-magnifying-glass"></i></a>
+                <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Show all activity for this device" href="{{ route('search', ['srjc_tag' => $activity->device->srjc_tag, 'serial_number' => $activity->device->serial_number, 'status_id' => 'any', 'current_status_only' => 'off']) }}"><i class="fa-solid fa-magnifying-glass"></i></a>
               </div>
             </td>
           </tr>
