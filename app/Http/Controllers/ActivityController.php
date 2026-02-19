@@ -112,8 +112,8 @@ class ActivityController extends Controller {
 
     // Saves the status for ease of adding multiple devices one after another.
     session(['saved_status' => $validated['status_id']]);
-
-    return redirect()->back()->with('success', 'Activity successfully added.');
+    $returnUrl = request()->input('return_url', route('log'));
+    return redirect($returnUrl)->with('success', 'Activity successfully added.');
   }
 
   /**

@@ -6,7 +6,7 @@
 
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-    <p class="text-gray-500 mb-6 text-sm">Paste tag numbers or serial numbers from the library export, select the incoming status, and compare against our database.</p>
+    <p class="text-gray-500 mb-6 text-sm">Paste SRJC tags or serial numbers from the library export, select the incoming status, and compare against our database.</p>
 
     {{-- Flash messages --}}
     @if(session('success'))
@@ -29,20 +29,20 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Identifier Type</label>
                     <div class="flex rounded-lg overflow-hidden border border-gray-300">
                         <button type="button"
-                            id="btn-tag"
-                            onclick="setIdentifierType('tag')"
+                            id="btn-srjc-tag"
+                            onclick="setIdentifierType('srjc_tag')"
                             class="flex-1 py-2 text-sm font-medium transition-colors bg-indigo-600 text-white">
-                            Tag Number
+                            SRJC Tag
                         </button>
                         <button type="button"
-                            id="btn-serial"
-                            onclick="setIdentifierType('serial')"
-                            class="flex-1 py-2 text-sm font-medium transition-colors bg-white text-gray-700 hover:bg-gray-50">
+                            id="btn-serial-number"
+                            onclick="setIdentifierType('serial_number')"
+                            class="flex-1 py-2 text-sm font-medium transition-colors bg-white text-gray-700">
                             Serial Number
                         </button>
                     </div>
                     <input type="hidden" name="identifier_type" id="identifier_type"
-                        value="{{ old('identifier_type', $last_identifier_type ?? 'tag') }}">
+                        value="{{ old('identifier_type', $last_identifier_type ?? 'srjc_tag') }}">
                 </div>
 
                 {{-- Incoming status dropdown --}}
@@ -86,15 +86,58 @@
         </div>
     </form>
 
+    @isset($results)
+      @php
+        $counts = collect($results)->countBy('result_type');
+      @endphp
+
+
+    @if($counts->get('mismatch', 0) > 0 || $counts->get('delete_flag', 0) > 0)
+    <div class="flex gap-3 mb-4">
+
+        @if($counts->get('mismatch', 0) > 0)
+            <form method="POST" action="{{ route('admin.library_comparison.update-all') }}">
+                @csrf
+                @foreach($results as $row)
+                    @if($row['result_type'] === 'mismatch')
+                        <input type="hidden" name="updates[]" value="{{ $row['device']->id }}:{{ $row['mapped_status']->id }}">
+                    @endif
+                @endforeach
+                <button type="submit"
+                    class="rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-semibold px-4 py-2 transition-colors"
+                    onclick="return confirm('Update all {{ $counts->get('mismatch', 0) }} mismatched devices?')">
+                    ⚡ Update All Mismatches ({{ $counts->get('mismatch', 0) }})
+                </button>
+            </form>
+        @endif
+
+        @if($counts->get('delete_flag', 0) > 0)
+            <form method="POST" action="{{ route('admin.library_comparison.flag-all') }}">
+              <input type="hidden" name="note" value="{{ session('lc_incoming_status') }}">
+
+                @csrf
+                @foreach($results as $row)
+                    @if($row['result_type'] === 'delete_flag')
+                        <input type="hidden" name="device_ids[]" value="{{ $row['device']->id }}">
+                    @endif
+                @endforeach
+                <button type="submit"
+                    class="rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-semibold px-4 py-2 transition-colors"
+                    onclick="return confirm('Flag all {{ $counts->get('delete_flag', 0) }} devices for review?')">
+                    ⚑ Flag All for Review ({{ $counts->get('delete_flag', 0) }})
+                </button>
+            </form>
+        @endif
+
+      </div>
+    @endif
+  @endisset
     {{-- ------------------------------------------------------------------ --}}
     {{-- RESULTS TABLE                                                       --}}
     {{-- ------------------------------------------------------------------ --}}
     @isset($results)
 
         {{-- Summary bar --}}
-        @php
-            $counts = collect($results)->countBy('result_type');
-        @endphp
         <div class="flex flex-wrap gap-3 mb-4">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold px-3 py-1">
                 ✅ Match: {{ $counts->get('match', 0) }}
@@ -146,9 +189,9 @@
                         {{-- Device info --}}
                         <td class="px-4 py-3 text-gray-600">
                             @if($row['device'])
-                                <div class="font-medium text-gray-800">{{ $row['device']->tag }}</div>
+                                <div class="font-medium text-gray-800">{{ $row['device']->srjc_tag }}</div>
                                 <div class="text-xs text-gray-500">{{ $row['device']->model_name }}</div>
-                                <div class="text-xs text-gray-400">S/N: {{ $row['device']->serial }}</div>
+                                <div class="text-xs text-gray-400">S/N: {{ $row['device']->serial_number }}</div>
                             @else
                                 <span class="text-gray-400 italic">Not in database</span>
                             @endif
@@ -157,7 +200,7 @@
                         {{-- Current status --}}
                         <td class="px-4 py-3">
                             @if($row['current_status'])
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $row['current_status']->tailwind_class }}">
+                                <span class="nline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['current_status']->tailwind_class }} text-neutral-50">
                                     {{ $row['current_status']->status_name }}
                                 </span>
                             @else
@@ -169,7 +212,7 @@
                         <td class="px-4 py-3">
                             @if($row['delete_flag'])
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-700">
-                                    ⚑ Lost & Paid — Flag for Review
+                                ⚑ {{ session('lc_incoming_status') }} — Flag for Review
                                 </span>
                             @elseif($row['mapped_status'])
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $row['mapped_status']->tailwind_class }}">
@@ -213,21 +256,28 @@
 
                             {{-- NOT FOUND: add device modal trigger --}}
                             @elseif($row['result_type'] === 'not_found')
-                                <button type="button"
-                                    onclick="openAddModal('{{ $row['identifier'] }}', '{{ $row['identifier_type'] }}', {{ $row['mapped_status'] ? $row['mapped_status']->id : 'null' }})"
-                                    class="inline-flex items-center gap-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors">
-                                    Add Device
-                                </button>
+                                <form method="POST" action="{{ route('log') }}">
+                                  @csrf
+                                  <input type="hidden" name="srjc_tag" value="{{ $row['identifier_type'] === 'srjc_tag' ? $row['identifier'] : '' }}">
+                                  <input type="hidden" name="serial_number" value="{{ $row['identifier_type'] === 'serial_number' ? $row['identifier'] : '' }}">
+                                  <input type="hidden" name="status_id" value="{{ $row['mapped_status']?->id }}">
+                                  <input type="hidden" name="username" value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
+                                  <input type="hidden" name="return_url" value="{{ route('admin.library_comparison.recompare') }}">
+                                  <button type="submit"
+                                      class="inline-flex items-center gap-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors">
+                                      Add Device
+                                  </button>
+                                </form>
 
                             {{-- DELETE FLAG: flag for review --}}
                             @elseif($row['result_type'] === 'delete_flag')
                                 <form method="POST" action="{{ route('admin.library_comparison.flag-device') }}">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $row['device']->id }}">
-                                    <input type="hidden" name="note" value="Lost and paid — flagged via library comparison tool.">
+                                    <input type="hidden" name="note" value="{{ session('lc_incoming_status') }}">
                                     <button type="submit"
                                         class="inline-flex items-center gap-1 rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
-                                        onclick="return confirm('Flag {{ $row['device']->tag }} for manual review?')">
+                                        onclick="return confirm('Flag {{ $row['device']->srjc_tag }} for manual review?')">
                                         Flag for Review
                                     </button>
                                 </form>
@@ -244,82 +294,8 @@
         </div>
     @endisset
 
-</div>
+  <x-device-modal />
 
-{{-- ------------------------------------------------------------------ --}}
-{{-- ADD DEVICE MODAL                                                    --}}
-{{-- ------------------------------------------------------------------ --}}
-<div id="addModal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 p-6">
-        <h2 class="text-lg font-bold text-gray-800 mb-4">Add New Device</h2>
-
-        <form method="POST" action="{{ route('admin.library_comparison.add-device') }}">
-            @csrf
-
-            <div class="space-y-4">
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Tag Number</label>
-                    <input type="text" name="tag" id="modal-tag" required
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Serial Number</label>
-                    <input type="text" name="serial" id="modal-serial" required
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Model Name</label>
-                    <input type="text" name="model_name" id="modal-model" required
-                        list="model-suggestions"
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                    <datalist id="model-suggestions">
-                        @isset($models)
-                            @foreach($models as $model)
-                                <option value="{{ $model }}">
-                            @endforeach
-                        @endisset
-                    </datalist>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Pool</label>
-                    <select name="pool_id" required
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Select a pool…</option>
-                        @foreach($pools as $pool)
-                            <option value="{{ $pool->id }}">{{ $pool->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Initial Status</label>
-                    <select name="status_id" id="modal-status" required
-                        class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option value="">Select a status…</option>
-                        @foreach($statuses as $status)
-                            <option value="{{ $status->id }}">{{ $status->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
-            </div>
-
-            <div class="flex gap-3 mt-6">
-                <button type="button" onclick="closeAddModal()"
-                    class="flex-1 rounded-lg border border-gray-300 text-gray-700 text-sm font-medium py-2 hover:bg-gray-50 transition-colors">
-                    Cancel
-                </button>
-                <button type="submit"
-                    class="flex-1 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 transition-colors">
-                    Add Device
-                </button>
-            </div>
-        </form>
-    </div>
 </div>
 
 {{-- ------------------------------------------------------------------ --}}
@@ -332,51 +308,21 @@
 
     function setIdentifierType(type) {
         document.getElementById('identifier_type').value = type;
-        const btnTag    = document.getElementById('btn-tag');
-        const btnSerial = document.getElementById('btn-serial');
+        const btnSRJCTag    = document.getElementById('btn-srjc-tag');
+        const btnSerialNumber = document.getElementById('btn-serial-number');
 
-        if (type === 'tag') {
-            btnTag.classList.add('bg-indigo-600', 'text-white');
-            btnTag.classList.remove('bg-white', 'text-gray-700');
-            btnSerial.classList.add('bg-white', 'text-gray-700');
-            btnSerial.classList.remove('bg-indigo-600', 'text-white');
+        if (type === 'srjc_tag') {
+            btnSRJCTag.classList.add('bg-indigo-600', 'text-white');
+            btnSRJCTag.classList.remove('bg-white', 'text-gray-700');
+            btnSerialNumber.classList.add('bg-white', 'text-gray-700');
+            btnSerialNumber.classList.remove('bg-indigo-600', 'text-white');
         } else {
-            btnSerial.classList.add('bg-indigo-600', 'text-white');
-            btnSerial.classList.remove('bg-white', 'text-gray-700');
-            btnTag.classList.add('bg-white', 'text-gray-700');
-            btnTag.classList.remove('bg-indigo-600', 'text-white');
+            btnSerialNumber.classList.add('bg-indigo-600', 'text-white');
+            btnSerialNumber.classList.remove('bg-white', 'text-gray-700');
+            btnSRJCTag.classList.add('bg-white', 'text-gray-700');
+            btnSRJCTag.classList.remove('bg-indigo-600', 'text-white');
         }
     }
 
-    // Add device modal
-    function openAddModal(identifier, type, statusId) {
-        // Pre-fill whichever field matches the identifier type
-        if (type === 'tag') {
-            document.getElementById('modal-tag').value = identifier;
-            document.getElementById('modal-serial').value = '';
-        } else {
-            document.getElementById('modal-serial').value = identifier;
-            document.getElementById('modal-tag').value = '';
-        }
-
-        // Pre-select the mapped status if available
-        if (statusId) {
-            const sel = document.getElementById('modal-status');
-            for (let opt of sel.options) {
-                if (opt.value == statusId) { opt.selected = true; break; }
-            }
-        }
-
-        document.getElementById('addModal').classList.remove('hidden');
-    }
-
-    function closeAddModal() {
-        document.getElementById('addModal').classList.add('hidden');
-    }
-
-    // Close modal on backdrop click
-    document.getElementById('addModal').addEventListener('click', function(e) {
-        if (e.target === this) closeAddModal();
-    });
 </script>
 </x-layout>

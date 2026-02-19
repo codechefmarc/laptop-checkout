@@ -96,4 +96,44 @@ class ExportController extends Controller {
     }, 200, $headers);
   }
 
+/**
+ * Handles export of flagged devices to CSV.
+ */
+  public function flaggedDevices() {
+    $devices = Device::where('flagged_for_review', TRUE)
+      ->with(['activities.status'])
+      ->orderBy('updated_at', 'desc')
+      ->get();
+
+    $filename = 'flagged_devices_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+    $headers = [
+      'Content-Type'        => 'text/csv',
+      'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+    ];
+
+    return response()->stream(function () use ($devices) {
+      $file = fopen('php://output', 'w');
+
+      fputcsv($file, [
+        'Date Flagged', 'SRJC Tag', 'Serial Number',
+        'Model Number', 'Flag Reason', 'Last Status',
+      ]);
+
+      foreach ($devices as $device) {
+          $lastActivity = $device->activities->sortByDesc('created_at')->first();
+          fputcsv($file, [
+            $device->updated_at->format('m/d/Y'),
+            $device->srjc_tag ?? '',
+            $device->serial_number ?? '',
+            $device->model_number ?? '',
+            $device->flag_note ?? '',
+            $lastActivity?->status?->status_name ?? '',
+          ]);
+      }
+
+      fclose($file);
+    }, 200, $headers);
+  }
+
 }

@@ -8,6 +8,7 @@
       <form method="POST" action="{{ route('log') }}">
         @csrf
         <!-- Hidden fields for activity data -->
+        <input type="hidden" name="return_url" value="{{ old('return_url', request('return_url', route('log'))) }}" />
         <input type="hidden" name="creating_device" value="1">
         <input type="hidden" name="status_id" value="{{ old('status_id') }}" />
         <input type="hidden" name="notes" value="{{ old('notes') }}" />

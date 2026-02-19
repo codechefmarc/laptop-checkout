@@ -25,9 +25,17 @@ class LibraryComparisonController extends Controller {
   public function index() {
     $statuses         = Status::orderBy('weight')->get();
     $pools            = Pool::orderBy('name')->get();
+    $models           = Device::select('model_number')->distinct()->orderBy('model_number')->pluck('model_number');
     $incomingStatuses = $this->incomingStatusOptions();
+    $results          = session('lc_results');
 
-    return view('admin.library-comparison.index', compact('statuses', 'pools', 'incomingStatuses'));
+    return view('admin.library-comparison.index', compact(
+        'statuses', 'pools', 'incomingStatuses', 'models', 'results'
+    ))->with([
+      'last_identifiers'     => session('lc_identifiers'),
+      'last_identifier_type' => session('lc_identifier_type'),
+      'last_incoming_status' => session('lc_incoming_status'),
+    ]);
   }
 
   /**
@@ -35,9 +43,9 @@ class LibraryComparisonController extends Controller {
    */
   public function compare(Request $request) {
     $request->validate([
-      'identifiers'       => 'required|string',
-      'identifier_type'   => 'required|in:srjc_tag,serial_number',
-      'incoming_status'   => 'required|string',
+      'identifiers'     => 'required|string',
+      'identifier_type' => 'required|in:srjc_tag,serial_number',
+      'incoming_status' => 'required|string',
     ]);
 
     session([
@@ -46,18 +54,32 @@ class LibraryComparisonController extends Controller {
       'lc_incoming_status' => $request->incoming_status,
     ]);
 
-    // Parse pasted identifiers (one per line, trim whitespace, drop blanks)
-    $identifiers = collect(explode("\n", $request->identifiers))
+    return $this->runComparison($request->identifiers, $request->identifier_type, $request->incoming_status);
+  }
+
+  /**
+   * Re-run comparison with last input (after taking actions).
+   */
+  public function reCompare() {
+    if (!session()->has('lc_identifiers')) {
+      return redirect()->route('admin.library_comparison.index');
+    }
+
+    return $this->runComparison(
+      session('lc_identifiers'),
+      session('lc_identifier_type'),
+      session('lc_incoming_status')
+    );
+  }
+
+  /**
+   * Run the comparison logic.
+   */
+  private function runComparison(string $identifiers, string $identifierType, string $incomingLabel): \Illuminate\Http\RedirectResponse {
+    $identifierList = collect(explode("\n", $identifiers))
       ->map(fn($line) => trim($line))
-      ->filter()
-      ->unique()
-      ->values();
+      ->filter()->unique()->values();
 
-    // 'tag' or 'serial'
-    $identifierType = $request->identifier_type;
-    $incomingLabel  = $request->incoming_status;
-
-    // Resolve what our internal status should be for this incoming label.
     $mapping      = $this->resolveMapping($incomingLabel);
     $mappedStatus = isset($mapping['status'])
         ? Status::where('status_name', $mapping['status'])->first()
@@ -66,9 +88,8 @@ class LibraryComparisonController extends Controller {
 
     $results = [];
 
-    foreach ($identifiers as $identifier) {
-      // Find device by tag or serial.
-      $device = $identifierType === 'tag'
+    foreach ($identifierList as $identifier) {
+      $device = $identifierType === 'srjc_tag'
           ? Device::where('srjc_tag', $identifier)->first()
           : Device::where('serial_number', $identifier)->first();
 
@@ -80,26 +101,19 @@ class LibraryComparisonController extends Controller {
           'current_status'  => NULL,
           'mapped_status'   => $mappedStatus,
           'delete_flag'     => $isDeleteFlag,
-          // Not in our DB.
           'result_type'     => 'not_found',
         ];
         continue;
       }
 
-      // Get most recent activity for this device.
       $latestActivity = Activity::where('device_id', $device->id)
-        ->with('status')
-        ->latest()
-        ->first();
-
+        ->with('status')->latest()->first();
       $currentStatus = $latestActivity?->status;
 
-      // Determine result type.
       if ($isDeleteFlag) {
         $resultType = 'delete_flag';
       }
       elseif (!$mappedStatus) {
-        // Incoming status has no mapping.
         $resultType = 'unmapped';
       }
       elseif ($currentStatus && $currentStatus->id === $mappedStatus->id) {
@@ -120,36 +134,9 @@ class LibraryComparisonController extends Controller {
       ];
     }
 
-    $statuses         = Status::orderBy('weight')->get();
-    $pools            = Pool::orderBy('name')->get();
-    $models           = Device::select('model_number')->distinct()->orderBy('model_number')->pluck('model_number');
-    $incomingStatuses = $this->incomingStatusOptions();
+    session(['lc_results' => $results]);
 
-    return view('admin.library-comparison.index', compact(
-        'results', 'statuses', 'pools', 'incomingStatuses', 'models',
-    ))->with([
-      'last_identifiers'     => $request->identifiers,
-      'last_identifier_type' => $identifierType,
-      'last_incoming_status' => $incomingLabel,
-    ]);
-  }
-
-  /**
-   * Re-run comparison with last input (after taking actions).
-   */
-  public function recompare() {
-    if (!session()->has('lc_identifiers')) {
-      return redirect()->route('admin.library_comparison.index');
-    }
-
-    $request = new Request();
-    $request->replace([
-      'identifiers'     => session('lc_identifiers'),
-      'identifier_type' => session('lc_identifier_type'),
-      'incoming_status' => session('lc_incoming_status'),
-    ]);
-
-    return $this->compare($request);
+    return redirect()->route('admin.library_comparison.index');
   }
 
   /**
@@ -165,9 +152,10 @@ class LibraryComparisonController extends Controller {
       'device_id' => $request->device_id,
       'status_id' => $request->status_id,
       'username' => Auth::user()->first_name . ' ' . Auth::user()->last_name,
+      'notes' => 'Status updated via library comparison tool.',
     ]);
 
-    return redirect()->route('library-comparison.recompare')
+    return redirect()->route('admin.library_comparison.recompare')
       ->with('success', 'Status updated successfully.');
   }
 
@@ -176,8 +164,8 @@ class LibraryComparisonController extends Controller {
    */
   public function addDevice(Request $request) {
     $request->validate([
-      'tag'        => 'required|string|unique:devices,tag',
-      'serial'     => 'required|string|unique:devices,serial',
+      'srjc_tag'        => 'required|string|unique:devices,srjc_tag',
+      'serial_number'     => 'required|string|unique:devices,serial_number',
       'model_name' => 'required|string|max:255',
       'pool_id'    => 'required|exists:pools,id',
       'status_id'  => 'required|exists:statuses,id',
@@ -185,8 +173,8 @@ class LibraryComparisonController extends Controller {
 
     DB::transaction(function () use ($request) {
         $device = Device::create([
-          'tag'        => $request->tag,
-          'serial'     => $request->serial,
+          'srjc_tag'        => $request->srjc_tag,
+          'serial_number'     => $request->serial_number,
           'model_name' => $request->model_name,
           'pool_id'    => $request->pool_id,
         ]);
@@ -214,9 +202,12 @@ class LibraryComparisonController extends Controller {
     // Here we just add an activity with a "flagged" status if one exists,
     // otherwise we rely on your existing flagging mechanism.
     $device = Device::findOrFail($request->device_id);
-    $device->update(['flagged_for_review' => TRUE, 'flag_note' => $request->note]);
+    $device->update([
+      'flagged_for_review' => TRUE,
+      'flag_note'          => $request->note,
+    ]);
 
-    return back()->with('success', "Device {$device->tag} flagged for manual review.");
+    return back()->with('success', "Device {$device->srjc_tag} flagged for manual review.");
   }
 
   /**
@@ -231,16 +222,18 @@ class LibraryComparisonController extends Controller {
   private function resolveMapping(string $incomingLabel): array {
     $map = config('library_status_map');
 
-    // Check "item in place" case.
     if (strtolower($incomingLabel) === strtolower($map['item_in_place']['label'])) {
       return ['status' => $map['item_in_place']['status']];
     }
 
-    // Check reasons.
-    $reasons = $map['reasons'];
-    $key     = strtolower($incomingLabel);
+    // Lowercase all keys for case-insensitive matching.
+    $reasons = collect($map['reasons'])
+      ->mapWithKeys(fn($value, $key) => [strtolower($key) => $value])
+      ->all();
 
-    return $reasons[$key] ?? ['status' => NULL, 'delete_flag' => NULL];
+    $key = strtolower($incomingLabel);
+
+    return $reasons[$key] ?? ['status' => NULL, 'delete_flag' => FALSE];
   }
 
   /**
@@ -258,7 +251,7 @@ class LibraryComparisonController extends Controller {
     foreach ($map['reasons'] as $key => $mapping) {
       $label = ucfirst($key);
       $target = $mapping['delete_flag'] ?? FALSE
-          ? '⚑ Flag for review (lost & paid)'
+          ? '(Flag for review)'
           : '→ ' . ($mapping['status'] ?? 'Unmapped');
 
       $options[$key] = "{$label} {$target}";
@@ -266,6 +259,49 @@ class LibraryComparisonController extends Controller {
 
     return $options;
 
+  }
+
+  /**
+   * Bulk update statuses for multiple devices at once.
+   */
+  public function updateAll(Request $request) {
+    $request->validate([
+      'updates'   => 'required|array',
+      'updates.*' => 'string',
+    ]);
+
+    foreach ($request->updates as $update) {
+      [$deviceId, $statusId] = explode(':', $update);
+      Activity::create([
+        'device_id' => $deviceId,
+        'status_id' => $statusId,
+        'username'  => Auth::user()->first_name . ' ' . Auth::user()->last_name,
+        'notes' => 'Status updated via library comparison tool.',
+      ]);
+    }
+
+    return redirect()->route('admin.library_comparison.recompare')
+      ->with('success', count($request->updates) . ' devices updated successfully.');
+  }
+
+  /**
+   * Bulk flag multiple devices for review at once.
+   */
+  public function flagAll(Request $request) {
+    $request->validate([
+      'device_ids'   => 'required|array',
+      'device_ids.*' => 'exists:devices,id',
+      'note'         => 'nullable|string',
+    ]);
+
+    Device::whereIn('id', $request->device_ids)
+      ->update([
+        'flagged_for_review' => TRUE,
+        'flag_note'          => $request->note,
+      ]);
+
+    return redirect()->route('admin.library_comparison.recompare')
+      ->with('success', count($request->device_ids) . ' devices flagged for review.');
   }
 
 }
