@@ -145,6 +145,9 @@ class LibraryComparisonController extends Controller {
     return redirect()->route('admin.library_comparison.index');
   }
 
+  /**
+   * Run comparison for missing devices-those in ITC but not in library export.
+   */
   private function runMissingComparison(string $identifiers): RedirectResponse {
     $identifierList = collect(explode("\n", $identifiers))
       ->map(fn($line) => trim($line))

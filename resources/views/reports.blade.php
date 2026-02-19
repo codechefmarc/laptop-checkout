@@ -16,7 +16,7 @@
             <a class="text-blue-500" href="{{ route('admin.flagged_devices.index') }}">
           @endif
         @endauth
-        Devices Flagged for Deletion
+        Flagged for Review / Deletion
         @auth
           @if(auth()->user()->isAdmin())
             </a>
