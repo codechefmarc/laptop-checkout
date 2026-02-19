@@ -6,6 +6,8 @@
  */
 
 use App\Http\Controllers\ActivityController;
+use App\Http\Controllers\Admin\FlaggedDeviceController;
+use App\Http\Controllers\Admin\LibraryComparisonController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DeviceController;
@@ -32,6 +34,24 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 // Admin users.
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
   Route::resource('users', UserController::class)->except(['show']);
+
+  Route::prefix('library-comparison')->name('library_comparison.')->group(function () {
+    Route::get('/', [LibraryComparisonController::class, 'index'])->name('index');
+    Route::post('/compare', [LibraryComparisonController::class, 'compare'])->name('compare');
+    Route::get('/recompare', [LibraryComparisonController::class, 'reCompare'])->name('recompare');
+    Route::post('/update-status', [LibraryComparisonController::class, 'updateStatus'])->name('update-status');
+    Route::post('/add-device', [LibraryComparisonController::class, 'addDevice'])->name('add-device');
+    Route::post('/flag-device', [LibraryComparisonController::class, 'flagDevice'])->name('flag-device');
+    Route::post('/update-all', [LibraryComparisonController::class, 'updateAll'])->name('update-all');
+    Route::post('/flag-all', [LibraryComparisonController::class, 'flagAll'])->name('flag-all');
+  });
+
+  Route::prefix('flagged-devices')->name('flagged_devices.')->group(function () {
+    Route::get('/', [FlaggedDeviceController::class, 'index'])->name('index');
+    Route::delete('/bulk-destroy', [FlaggedDeviceController::class, 'bulkDestroy'])->name('bulk_destroy');
+    Route::delete('/{device}', [FlaggedDeviceController::class, 'destroy'])->name('destroy');
+  });
+
 });
 
 // User profile - users can edit their own profile.
@@ -90,6 +110,7 @@ Route::middleware(['auth'])->group(function () {
   Route::controller(ExportController::class)->group(function () {
     Route::get('/export/activities', 'activities')->name('export.activities');
     Route::get('/export/devices', 'devices')->name('export.devices');
+    Route::get('/export/flagged-devices', 'flaggedDevices')->name('export.flagged-devices');
   });
 });
 

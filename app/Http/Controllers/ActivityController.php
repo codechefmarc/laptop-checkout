@@ -49,7 +49,9 @@ class ActivityController extends Controller {
 
     $validated = request()->validate($basicRules);
 
-    $device = Device::findBySrjcOrSerial($validated['srjc_tag'] ?? NULL, $validated['serial_number'] ?? NULL);
+    $identifier = $validated['srjc_tag'] ?? $validated['serial_number'];
+
+    $device = Device::findBySrjcOrSerial($identifier);
 
     if (!$device) {
       if (Auth::user()->hasRole('student')) {
@@ -112,8 +114,8 @@ class ActivityController extends Controller {
 
     // Saves the status for ease of adding multiple devices one after another.
     session(['saved_status' => $validated['status_id']]);
-
-    return redirect()->back()->with('success', 'Activity successfully added.');
+    $returnUrl = request()->input('return_url', route('log'));
+    return redirect($returnUrl)->with('success', 'Activity successfully added.');
   }
 
   /**

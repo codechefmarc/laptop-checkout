@@ -94,6 +94,7 @@ class ReportsController extends Controller {
       'active_device_count' => $active_device_count,
       'surplus_device_count' => $surplus_device_count,
       'total_device_count' => Device::count(),
+      'flagged_device_count' => Device::where('flagged_for_review', TRUE)->count(),
       'status_counts' => $this->getCurrentStatus(),
       'pool_counts' => $this->getDeviceCountsByPool(),
       'pool_counts_current' => $this->getCurrentStatusByPool(),

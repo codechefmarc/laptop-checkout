@@ -46,32 +46,10 @@ class Device extends Model {
   /**
    * Find a device by SRJC tag or serial number.
    */
-  public static function findBySrjcOrSerial($srjcTag = NULL, $serialNumber = NULL) {
-    return self::where(function ($query) use ($srjcTag, $serialNumber) {
-      if ($srjcTag) {
-          $query->orWhere('srjc_tag', $srjcTag);
-      }
-      if ($serialNumber) {
-          $query->orWhere('serial_number', $serialNumber);
-      }
-    })->first();
-  }
-
-  /**
-   * Find or create a device by SRJC tag or serial number.
-   */
-  public static function findOrCreateBySrjcOrSerial($srjcTag = NULL, $serialNumber = NULL, $modelNumber = NULL) {
-    $device = self::findBySrjcOrSerial($srjcTag, $serialNumber);
-
-    if (!$device) {
-      $device = self::create([
-        'srjc_tag' => $srjcTag,
-        'serial_number' => $serialNumber,
-        'model_number' => $modelNumber,
-      ]);
-    }
-
-    return $device;
+  public static function findBySrjcOrSerial($identifier) {
+    return self::where('srjc_tag', $identifier)
+      ->orWhere('serial_number', $identifier)
+      ->first();
   }
 
 }
