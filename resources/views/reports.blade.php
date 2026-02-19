@@ -10,6 +10,20 @@
       <li><a class="text-blue-500" href="?report=active_devices">Active Devices</a> ({{ $active_device_count }})</li>
       <li><a class="text-blue-500" href="?report=surplus_devices">Surplus Devices</a> ({{ $surplus_device_count }})</li>
       <li><a class="text-blue-500" href="?report=inactive_devices">Devices Without Activities</a> ({{ $inactive_device_count }})</li>
+      <li>
+        @auth
+          @if(auth()->user()->isAdmin())
+            <a class="text-blue-500" href="{{ route('admin.flagged_devices.index') }}">
+          @endif
+        @endauth
+        Devices Flagged for Deletion
+        @auth
+          @if(auth()->user()->isAdmin())
+            </a>
+          @endif
+        @endauth
+        ({{ $flagged_device_count }})
+      </li>
       <li><a class="text-blue-500" href="?report=all_devices">Total Devices</a> ({{ $total_device_count }})</li>
     </ul>
     <h3 class="font-bold text-xl text-gray-600 mb-3 mt-3">Active Devices by Model</h3>

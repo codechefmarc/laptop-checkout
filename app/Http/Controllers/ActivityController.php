@@ -49,7 +49,9 @@ class ActivityController extends Controller {
 
     $validated = request()->validate($basicRules);
 
-    $device = Device::findBySrjcOrSerial($validated['srjc_tag'] ?? NULL, $validated['serial_number'] ?? NULL);
+    $identifier = $validated['srjc_tag'] ?? $validated['serial_number'];
+
+    $device = Device::findBySrjcOrSerial($identifier);
 
     if (!$device) {
       if (Auth::user()->hasRole('student')) {

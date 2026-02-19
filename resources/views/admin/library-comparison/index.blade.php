@@ -3,17 +3,9 @@
   Library Comparison Tool
 </x-slot:heading>
 
-
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-    <p class="text-gray-500 mb-6 text-sm">Paste SRJC tags or serial numbers from the library export, select the incoming status, and compare against our database.</p>
-
-    {{-- Flash messages --}}
-    @if(session('success'))
-        <div class="mb-4 rounded-md bg-green-50 border border-green-200 px-4 py-3 text-green-800 text-sm">
-            {{ session('success') }}
-        </div>
-    @endif
+    <p class="text-gray-500 mb-6 text-sm">Paste SRJC tags or serial numbers from the library export one per line, and select the incoming status.</p>
 
     {{-- ------------------------------------------------------------------ --}}
     {{-- INPUT FORM                                                          --}}
@@ -22,33 +14,36 @@
         @csrf
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                {{-- Identifier type toggle --}}
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Identifier Type</label>
-                    <div class="flex rounded-lg overflow-hidden border border-gray-300">
-                        <button type="button"
-                            id="btn-srjc-tag"
-                            onclick="setIdentifierType('srjc_tag')"
-                            class="flex-1 py-2 text-sm font-medium transition-colors bg-indigo-600 text-white">
-                            SRJC Tag
-                        </button>
-                        <button type="button"
-                            id="btn-serial-number"
-                            onclick="setIdentifierType('serial_number')"
-                            class="flex-1 py-2 text-sm font-medium transition-colors bg-white text-gray-700">
-                            Serial Number
-                        </button>
-                    </div>
-                    <input type="hidden" name="identifier_type" id="identifier_type"
-                        value="{{ old('identifier_type', $last_identifier_type ?? 'srjc_tag') }}">
-                </div>
+        <div class="mb-4">
+          <div class="flex items-center gap-3">
+            <input
+              type="radio"
+              name="search_type"
+              id="search_type_status"
+              onChange="toggleIncomingStatus()"
+              value="search_type_status"
+              {{ old('search_type', $last_search_type ?? '') === 'search_type_status' ? 'checked' : '' }}
+            >
+            <label for="search_type_status" class="block text-sm font-medium text-gray-700">Search by status</label>
+          </div>
+          <div class="flex items-center gap-3">
+            <input
+              type="radio"
+              name="search_type"
+              id="search_type_missing"
+              onChange="toggleIncomingStatus()"
+              value="search_type_missing"
+              {{ old('search_type', $last_search_type ?? '') === 'search_type_missing' ? 'checked' : '' }}
+              >
+            <label for="search_type_missing" class="block text-sm font-medium text-gray-700">Show ITC devices missing from Library <small class="ml-2">(Remember to paste ALL SRJC/Serial)</small></label>
+          </div>
+        </div>
+        <div class="flex gap-6 justify-between">
 
                 {{-- Incoming status dropdown --}}
                 <div>
                     <label for="incoming_status" class="block text-sm font-medium text-gray-700 mb-2">
-                        Incoming Status <span class="text-gray-400 font-normal">(their label)</span>
+                        Incoming Status <span class="text-gray-400 font-normal">(Library label)</span>
                     </label>
                     <select name="incoming_status" id="incoming_status"
                         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -74,7 +69,7 @@
             {{-- Paste area --}}
             <div class="mt-5">
                 <label for="identifiers" class="block text-sm font-medium text-gray-700 mb-2">
-                    Paste Identifiers <span class="text-gray-400 font-normal">(one per line, from Excel)</span>
+                    Paste SRJC or Serial <span class="text-gray-400 font-normal">(one per line, from Excel)</span>
                 </label>
                 <textarea name="identifiers" id="identifiers" rows="6"
                     placeholder="ABC123&#10;DEF456&#10;GHI789"
@@ -183,15 +178,14 @@
                         {{-- Identifier --}}
                         <td class="px-4 py-3 font-mono font-medium text-gray-800">
                             {{ $row['identifier'] }}
-                            <span class="text-gray-400 text-xs">({{ $row['identifier_type'] }})</span>
                         </td>
 
                         {{-- Device info --}}
                         <td class="px-4 py-3 text-gray-600">
                             @if($row['device'])
-                                <div class="font-medium text-gray-800">{{ $row['device']->srjc_tag }}</div>
-                                <div class="text-xs text-gray-500">{{ $row['device']->model_name }}</div>
-                                <div class="text-xs text-gray-400">S/N: {{ $row['device']->serial_number }}</div>
+                                <div class="font-medium text-gray-800">SRJC: {{ $row['device']->srjc_tag }}</div>
+                                <div class="text-xs text-gray-400">SN: {{ $row['device']->serial_number }}</div>
+                                <div class="text-xs text-gray-500">{{ $row['device']->model_number }}</div>
                             @else
                                 <span class="text-gray-400 italic">Not in database</span>
                             @endif
@@ -200,7 +194,7 @@
                         {{-- Current status --}}
                         <td class="px-4 py-3">
                             @if($row['current_status'])
-                                <span class="nline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['current_status']->tailwind_class }} text-neutral-50">
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['current_status']->tailwind_class }} text-neutral-50">
                                     {{ $row['current_status']->status_name }}
                                 </span>
                             @else
@@ -258,8 +252,6 @@
                             @elseif($row['result_type'] === 'not_found')
                                 <form method="POST" action="{{ route('log') }}">
                                   @csrf
-                                  <input type="hidden" name="srjc_tag" value="{{ $row['identifier_type'] === 'srjc_tag' ? $row['identifier'] : '' }}">
-                                  <input type="hidden" name="serial_number" value="{{ $row['identifier_type'] === 'serial_number' ? $row['identifier'] : '' }}">
                                   <input type="hidden" name="status_id" value="{{ $row['mapped_status']?->id }}">
                                   <input type="hidden" name="username" value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
                                   <input type="hidden" name="return_url" value="{{ route('admin.library_comparison.recompare') }}">
@@ -270,7 +262,7 @@
                                 </form>
 
                             {{-- DELETE FLAG: flag for review --}}
-                            @elseif($row['result_type'] === 'delete_flag')
+                            @elseif($row['result_type'] === 'delete_flag' || $row['result_type'] === 'missing_from_library')
                                 <form method="POST" action="{{ route('admin.library_comparison.flag-device') }}">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $row['device']->id }}">
@@ -298,31 +290,21 @@
 
 </div>
 
-{{-- ------------------------------------------------------------------ --}}
-{{-- JS                                                                  --}}
-{{-- ------------------------------------------------------------------ --}}
 <script>
-    // Identifier type toggle
-    const savedType = document.getElementById('identifier_type').value;
-    setIdentifierType(savedType);
 
-    function setIdentifierType(type) {
-        document.getElementById('identifier_type').value = type;
-        const btnSRJCTag    = document.getElementById('btn-srjc-tag');
-        const btnSerialNumber = document.getElementById('btn-serial-number');
+  function toggleIncomingStatus() {
+    const selectedType = document.querySelector('input[name="search_type"]:checked').id;
+    const incomingStatusSelect = document.getElementById('incoming_status');
 
-        if (type === 'srjc_tag') {
-            btnSRJCTag.classList.add('bg-indigo-600', 'text-white');
-            btnSRJCTag.classList.remove('bg-white', 'text-gray-700');
-            btnSerialNumber.classList.add('bg-white', 'text-gray-700');
-            btnSerialNumber.classList.remove('bg-indigo-600', 'text-white');
-        } else {
-            btnSerialNumber.classList.add('bg-indigo-600', 'text-white');
-            btnSerialNumber.classList.remove('bg-white', 'text-gray-700');
-            btnSRJCTag.classList.add('bg-white', 'text-gray-700');
-            btnSRJCTag.classList.remove('bg-indigo-600', 'text-white');
-        }
+    if (selectedType === 'search_type_status') {
+      incomingStatusSelect.disabled = false;
+      incomingStatusSelect.parentElement.classList.remove('opacity-50');
+    } else {
+      incomingStatusSelect.disabled = true;
+      incomingStatusSelect.parentElement.classList.add('opacity-50');
     }
-
+  }
+  toggleIncomingStatus(); // Initialize on page load
 </script>
+
 </x-layout>

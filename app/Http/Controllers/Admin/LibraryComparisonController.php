@@ -7,6 +7,7 @@ use App\Models\Activity;
 use App\Models\Device;
 use App\Models\Pool;
 use App\Models\Status;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -33,8 +34,8 @@ class LibraryComparisonController extends Controller {
         'statuses', 'pools', 'incomingStatuses', 'models', 'results'
     ))->with([
       'last_identifiers'     => session('lc_identifiers'),
-      'last_identifier_type' => session('lc_identifier_type'),
       'last_incoming_status' => session('lc_incoming_status'),
+      'last_search_type'     => session('lc_search_type'),
     ]);
   }
 
@@ -42,19 +43,29 @@ class LibraryComparisonController extends Controller {
    * Run the comparison and return results.
    */
   public function compare(Request $request) {
+
+    $isMissing = $request->search_type === 'search_type_missing';
+
     $request->validate([
       'identifiers'     => 'required|string',
-      'identifier_type' => 'required|in:srjc_tag,serial_number',
-      'incoming_status' => 'required|string',
+      'incoming_status' => $isMissing ? 'nullable' : 'required|string',
+      'search_type'     => 'required|in:search_type_status,search_type_missing',
     ]);
 
     session([
       'lc_identifiers'     => $request->identifiers,
-      'lc_identifier_type' => $request->identifier_type,
       'lc_incoming_status' => $request->incoming_status,
+      'lc_search_type'       => $request->search_type,
     ]);
 
-    return $this->runComparison($request->identifiers, $request->identifier_type, $request->incoming_status);
+    if ($request->search_type === 'search_type_missing') {
+      session([
+        'lc_incoming_status' => 'Missing from library export',
+      ]);
+      return $this->runMissingComparison($request->identifiers);
+    }
+
+    return $this->runComparison($request->identifiers, $request->incoming_status);
   }
 
   /**
@@ -67,7 +78,6 @@ class LibraryComparisonController extends Controller {
 
     return $this->runComparison(
       session('lc_identifiers'),
-      session('lc_identifier_type'),
       session('lc_incoming_status')
     );
   }
@@ -75,7 +85,7 @@ class LibraryComparisonController extends Controller {
   /**
    * Run the comparison logic.
    */
-  private function runComparison(string $identifiers, string $identifierType, string $incomingLabel): \Illuminate\Http\RedirectResponse {
+  private function runComparison(string $identifiers, string $incomingLabel): RedirectResponse {
     $identifierList = collect(explode("\n", $identifiers))
       ->map(fn($line) => trim($line))
       ->filter()->unique()->values();
@@ -89,14 +99,11 @@ class LibraryComparisonController extends Controller {
     $results = [];
 
     foreach ($identifierList as $identifier) {
-      $device = $identifierType === 'srjc_tag'
-          ? Device::where('srjc_tag', $identifier)->first()
-          : Device::where('serial_number', $identifier)->first();
+      $device = Device::findBySrjcOrSerial($identifier);
 
       if (!$device) {
         $results[] = [
           'identifier'      => $identifier,
-          'identifier_type' => $identifierType,
           'device'          => NULL,
           'current_status'  => NULL,
           'mapped_status'   => $mappedStatus,
@@ -125,7 +132,6 @@ class LibraryComparisonController extends Controller {
 
       $results[] = [
         'identifier'      => $identifier,
-        'identifier_type' => $identifierType,
         'device'          => $device,
         'current_status'  => $currentStatus,
         'mapped_status'   => $mappedStatus,
@@ -133,6 +139,34 @@ class LibraryComparisonController extends Controller {
         'result_type'     => $resultType,
       ];
     }
+
+    session(['lc_results' => $results]);
+
+    return redirect()->route('admin.library_comparison.index');
+  }
+
+  private function runMissingComparison(string $identifiers): RedirectResponse {
+    $identifierList = collect(explode("\n", $identifiers))
+      ->map(fn($line) => trim($line))
+      ->filter()->unique()->values();
+
+    $devices = Device::where(function ($query) use ($identifierList) {
+      $query->whereNotIn('srjc_tag', $identifierList)
+        ->orWhereNull('srjc_tag');
+    })->whereNotIn('serial_number', $identifierList)->get();
+
+    $results = $devices->map(function ($device) {
+      $latestActivity = Activity::where('device_id', $device->id)
+        ->with('status')->latest()->first();
+      return [
+        'identifier'      => $device->srjc_tag ?: $device->serial_number,
+        'device'          => $device,
+        'current_status'  => $latestActivity?->status,
+        'mapped_status'   => NULL,
+        'delete_flag'     => TRUE,
+        'result_type'     => 'delete_flag',
+      ];
+    })->all();
 
     session(['lc_results' => $results]);
 
