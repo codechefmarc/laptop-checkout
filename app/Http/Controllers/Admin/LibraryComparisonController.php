@@ -40,6 +40,14 @@ class LibraryComparisonController extends Controller {
   }
 
   /**
+   * Reset the session data for the comparison (clear inputs and results).
+   */
+  public function reset() {
+    session()->forget(['lc_identifiers', 'lc_incoming_status', 'lc_search_type', 'lc_results']);
+    return redirect()->route('admin.library_comparison.index');
+  }
+
+  /**
    * Run the comparison and return results.
    */
   public function compare(Request $request) {

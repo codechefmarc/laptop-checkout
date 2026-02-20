@@ -44,6 +44,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/flag-device', [LibraryComparisonController::class, 'flagDevice'])->name('flag-device');
     Route::post('/update-all', [LibraryComparisonController::class, 'updateAll'])->name('update-all');
     Route::post('/flag-all', [LibraryComparisonController::class, 'flagAll'])->name('flag-all');
+    Route::get('/reset', [LibraryComparisonController::class, 'reset'])->name('reset');
   });
 
   Route::prefix('flagged-devices')->name('flagged_devices.')->group(function () {

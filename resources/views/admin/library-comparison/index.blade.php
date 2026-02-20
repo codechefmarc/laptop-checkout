@@ -17,7 +17,7 @@
               id="search_type_status"
               onChange="toggleIncomingStatus()"
               value="search_type_status"
-              {{ old('search_type', $last_search_type ?? '') === 'search_type_status' ? 'checked' : '' }}
+              {{ old('search_type', $last_search_type ?? 'search_type_status') === 'search_type_status' ? 'checked' : '' }}
             >
             <label for="search_type_status" class="block text-sm font-medium text-gray-700">Search by status</label>
           </div>
@@ -28,7 +28,7 @@
               id="search_type_missing"
               onChange="toggleIncomingStatus()"
               value="search_type_missing"
-              {{ old('search_type', $last_search_type ?? '') === 'search_type_missing' ? 'checked' : '' }}
+              {{ old('search_type', $last_search_type ?? 'search_type_status') === 'search_type_missing' ? 'checked' : '' }}
               >
             <label for="search_type_missing" class="block text-sm font-medium text-gray-700">Show ITC devices missing from Library <small class="ml-2">(Remember to paste ALL SRJC/Serial)</small></label>
           </div>
@@ -50,11 +50,15 @@
             @endforeach
           </select>
         </div>
-        <div class="flex items-end">
+        <div class="flex items-end flex-column">
           <button type="submit"
               class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors">
               Run Comparison
           </button>
+          <a href="{{ route('admin.library_comparison.reset') }}"
+            class="text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 px-4 py-2 ml-3">
+            Reset
+          </a>
         </div>
       </div>
 
