@@ -201,7 +201,7 @@
                               ⚑ {{ session('lc_incoming_status') }} — Flag for Review
                               </span>
                           @elseif($row['mapped_status'])
-                              <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $row['mapped_status']->tailwind_class }}">
+                              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['mapped_status']->tailwind_class }} text-neutral-50">
                                   {{ $row['mapped_status']->status_name }}
                               </span>
                           @else
