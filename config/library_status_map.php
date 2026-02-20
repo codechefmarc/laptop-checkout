@@ -60,4 +60,8 @@ return [
     ],
   ],
 
+  // Excluded from 'search missing' - known to be in other locations.
+  'excluded_pools' => [
+    'Adult Ed',
+  ],
 ];

@@ -165,10 +165,16 @@ class LibraryComparisonController extends Controller {
       ->map(fn($line) => trim($line))
       ->filter()->unique()->values();
 
+    $excludedPools = config('library_status_map.excluded_pools');
+
     $devices = Device::where(function ($query) use ($identifierList) {
       $query->whereNotIn('srjc_tag', $identifierList)
         ->orWhereNull('srjc_tag');
-    })->whereNotIn('serial_number', $identifierList)->get();
+    })->whereNotIn('serial_number', $identifierList)
+      ->whereDoesntHave('pool', function ($query) use ($excludedPools) {
+        $query->whereIn('name', $excludedPools);
+      })
+      ->get();
 
     $results = $devices->map(function ($device) {
       $latestActivity = Activity::where('device_id', $device->id)
