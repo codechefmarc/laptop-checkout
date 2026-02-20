@@ -64,7 +64,7 @@
             @enderror
         </div>
         <div class="px-6 py-4 border-t border-gray-200 flex gap-2 justify-end space-x-3">
-          <a href="{{ route('log') }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
+          <a href="{{ session('device_return_url', route('log')) }}" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200">
             Cancel
           </a>
           <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700">
@@ -81,7 +81,7 @@
   // Close on Escape key
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
-      window.location.href = "{{ route('log') }}";
+      window.location.href = "{{ session('device_return_url', route('log')) }}";
     }
   });
   </script>

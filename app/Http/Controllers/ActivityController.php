@@ -37,7 +37,7 @@ class ActivityController extends Controller {
 
     if ($isCreatingDevice) {
       $basicRules['model_number'] = ['required'];
-      $basicRules['serial_number'] = ['required'];
+      $basicRules['serial_number'] = ['required_without:srjc_tag'];
       $basicRules['pool_id'] = ['required', 'exists:pools,id'];
 
       $basicRules['serial_number'][] = 'unique:devices,serial_number';
@@ -62,7 +62,7 @@ class ActivityController extends Controller {
       if ($isCreatingDevice) {
         $device = Device::create([
           'srjc_tag' => $validated['srjc_tag'] ?? NULL,
-          'serial_number' => $validated['serial_number'],
+          'serial_number' => $validated['serial_number'] ?? NULL,
           'model_number' => $validated['model_number'],
           'pool_id' => $validated['pool_id'],
         ]);
@@ -72,12 +72,13 @@ class ActivityController extends Controller {
       }
       else {
         // Device doesn't exist and we don't have creation data yet.
+        session(['device_return_url' => request()->input('return_url', route('log'))]);
         return redirect()->back()
           ->withInput()
           ->with('device_not_found', TRUE)
           ->with('device_data', [
             'srjc_tag' => $validated['srjc_tag'] ?? NULL,
-            'serial_number' => $validated['serial_number'],
+            'serial_number' => $validated['serial_number'] ?? NULL,
           ]);
       }
     }
