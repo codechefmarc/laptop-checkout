@@ -193,12 +193,12 @@
                       {{-- Current status --}}
                       <td class="px-4 py-3">
                           @if($row['current_status'])
-                              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['current_status']->tailwind_class }} text-neutral-50">
-                                  {{ $row['current_status']->status_name }}
-                              </span>
-                              <div class="text-xs mt-2 text-gray-500">{{ $row['current_status']->created_at?->format('m/d/Y') }}</div>
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $row['current_status']->tailwind_class }} text-neutral-50">
+                                {{ $row['current_status']->status_name }}
+                            </span>
+                            <div class="text-xs mt-2 text-gray-500">{{ $row['latest_activity']?->created_at?->format('m/d/Y') }}</div>
                           @else
-                              <span class="text-gray-400 text-xs italic">None</span>
+                            <span class="text-gray-400 text-xs italic">None</span>
                           @endif
                       </td>
 
