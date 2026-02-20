@@ -242,8 +242,14 @@
 
                           {{-- NOT FOUND: add device modal trigger --}}
                           @elseif($row['result_type'] === 'not_found')
+                              @php
+                                $isSerial = preg_match('/[a-zA-Z]/', $row['identifier']);
+                              @endphp
+
                               <form method="POST" action="{{ route('log') }}">
                                 @csrf
+                                <input type="hidden" name="srjc_tag" value="{{ $isSerial ? '' : $row['identifier'] }}">
+                                <input type="hidden" name="serial_number" value="{{ $isSerial ? $row['identifier'] : '' }}">
                                 <input type="hidden" name="status_id" value="{{ $row['mapped_status']?->id }}">
                                 <input type="hidden" name="username" value="{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}">
                                 <input type="hidden" name="return_url" value="{{ route('admin.library_comparison.recompare') }}">

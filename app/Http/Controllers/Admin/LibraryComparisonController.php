@@ -76,9 +76,13 @@ class LibraryComparisonController extends Controller {
       return redirect()->route('admin.library_comparison.index');
     }
 
+    if (session('lc_search_type') === 'search_type_missing') {
+      return $this->runMissingComparison(session('lc_identifiers'));
+    }
+
     return $this->runComparison(
-      session('lc_identifiers'),
-      session('lc_incoming_status')
+        session('lc_identifiers'),
+        session('lc_incoming_status')
     );
   }
 
