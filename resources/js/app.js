@@ -5,6 +5,10 @@ import '@tailwindplus/elements';
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.css";
 
+// Sortable.
+import Sortable from 'sortablejs';
+window.Sortable = Sortable;
+
 const date_range = document.getElementById('date_range');
 if (date_range) {
   flatpickr(date_range, {
