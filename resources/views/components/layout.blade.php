@@ -105,5 +105,7 @@
       window.apiRoute = '{{ route("api.model-numbers") }}';
     </script>
 
+    @stack('footer_scripts')
+
   </body>
 </html>

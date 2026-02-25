@@ -21,7 +21,7 @@ return [
         'bg-yellow-500',
 
         // Green
-        'bg-green-500', 'bg-green-800',
+        'bg-green-600', 'bg-green-800',
 
         // Blue
         'bg-blue-500', 'bg-blue-800',
