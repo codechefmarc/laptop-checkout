@@ -25,7 +25,6 @@ class StatusSelect extends Component {
 
   public function __construct($selected = NULL) {
     $this->statuses = Status::orderBy('weight')->get();
-    //$this->statuses = Status::all();
     $this->selected = $selected
       ?? old('status_id')
       ?? session('saved_status')

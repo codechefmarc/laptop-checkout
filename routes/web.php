@@ -14,8 +14,10 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\ModelNumberController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\PoolController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\StatusController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -85,6 +87,18 @@ Route::middleware(['auth', 'can.edit'])->group(function () {
     Route::get('/device/edit/{device}', 'edit')->name('devices.edit');
     Route::delete('/device/delete/{device}', 'delete')->name('devices.delete');
   });
+});
+
+// Statuses.
+Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->group(function () {
+  Route::resource('status', StatusController::class);
+  Route::post('status/reorder', [StatusController::class, 'reorder'])->name('status.reorder');
+});
+
+// Pools.
+Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->group(function () {
+  Route::resource('pool', PoolController::class);
+  Route::post('pool/reorder', [PoolController::class, 'reorder'])->name('pool.reorder');
 });
 
 // Search.

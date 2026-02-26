@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image">
     <title>{{ $heading }} - ITC Laptop Inventory</title>
@@ -70,7 +71,7 @@
       </header>
       <main>
 
-        <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div class="{{ $containerClass ?? 'mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8' }}">
 
             {{-- Flash Messages --}}
             @if(session('info'))
@@ -104,6 +105,8 @@
       // Set the API route to be used in the autocomplete script.
       window.apiRoute = '{{ route("api.model-numbers") }}';
     </script>
+
+    @stack('footer_scripts')
 
   </body>
 </html>
