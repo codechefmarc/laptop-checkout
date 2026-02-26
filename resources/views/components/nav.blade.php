@@ -28,6 +28,9 @@
         <a href="{{ route('taxonomy.status.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Manage Statuses
         </a>
+        <a href="{{ route('taxonomy.pool.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
+          Manage Pools
+        </a>
         <a href="{{ route('admin.library_comparison.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Library Comparison
         </a>

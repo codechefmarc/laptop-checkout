@@ -24,7 +24,7 @@ class PoolSelect extends Component {
   public $selected;
 
   public function __construct($selected = NULL) {
-    $this->pools = Pool::all();
+    $this->pools = Pool::orderBy('weight')->get();
     $this->selected = $selected
       ?? old('pool_id')
       ?? session('saved_pool')
