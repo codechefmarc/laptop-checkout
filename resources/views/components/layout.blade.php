@@ -6,7 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="icon" href="{{ asset('favicon.ico') }}" type="image">
-    <title>{{ $heading }} - ITC Laptop Inventory</title>
+    <title>{{ $heading }} - ITC Database</title>
 
     @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
       @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -65,7 +65,7 @@
 
       <header class="bg-white shadow-sm">
         <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <h1 class="text-3xl font-bold tracking-tight text-gray-900">ITC Laptop Inventory</h1>
+          <h1 class="text-3xl font-bold tracking-tight text-gray-900">ITC Database</h1>
           <h2 class="font-bold text-2xl text-gray-600">{{ $heading }}</h2>
         </div>
       </header>

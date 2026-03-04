@@ -1,6 +1,7 @@
 @auth
   @if(auth()->user()->canEdit() || auth()->user()->isStudent())
     <x-nav-link href="{{ route('log') }}" :active="request()->routeIs('log')">Log Activity</x-nav-link>
+    <x-nav-link href="{{ route('walk_in_log') }}" :active="request()->routeIs('walk_in_log')">Walk In Log</x-nav-link>
   @endif
 @endauth
 
@@ -30,6 +31,9 @@
         </a>
         <a href="{{ route('taxonomy.pool.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Manage Pools
+        </a>
+        <a href="{{ route('taxonomy.support_category.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
+          Manage Support Categories
         </a>
         <a href="{{ route('admin.library_comparison.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Library Comparison
