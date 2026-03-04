@@ -20,7 +20,7 @@ return new class extends Migration {
       $table->string('username')->nullable();
       $table->text('description')->nullable();
       $table->boolean('escalated')->default(FALSE);
-      $table->integer('duration_seconds')->nullable();
+      $table->integer('duration_minutes')->nullable();
       $table->timestamps();
     });
 

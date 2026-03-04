@@ -24,6 +24,7 @@ class WalkInLog extends Model {
     'username',
     'description',
     'escalated',
+    'duration_minutes',
     'resolved',
   ];
 

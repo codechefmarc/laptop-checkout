@@ -76,12 +76,13 @@ Route::middleware(['auth', 'is.student'])->group(function () {
 });
 
 // Walk In Log.
-Route::middleware(['auth', 'is.student'])->group(function () {
+Route::middleware(['auth', 'role:student,admin'])->group(function () {
   Route::controller(WalkInLogController::class)->group(function () {
     Route::get('/walk-in-log', 'walkInLog')->name('walk_in_log');
     Route::post('/walk-in-log', 'storeWalkIn')->name('walk_in_log.store');
     Route::get('/walk-in-log/edit/{walkIn}', 'edit')->name('walk_in_log.edit');
     Route::patch('/walk-in-log/{walkIn}', 'patch')->name('walk_in_log.update');
+    Route::patch('/walk-in-log/complete/{walkIn}', 'complete')->name('walk_in_log.complete');
   });
 });
 
