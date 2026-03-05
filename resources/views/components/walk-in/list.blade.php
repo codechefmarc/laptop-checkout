@@ -71,9 +71,15 @@
             </td>
 
               @php
-              $durationDisplay = $walkIn->created_at->diffInMinutes(now()) <= 60
-                ? round($walkIn->created_at->diffInMinutes(now())) . ' minutes'
-                : round($walkIn->created_at->diffInMinutes(now()) / 60, 1) . ' hours';
+              if ($type === 'Active') {
+                $durationDisplay = $walkIn->created_at->diffInMinutes(now()) <= 60
+                  ? round($walkIn->created_at->diffInMinutes(now())) . ' minutes'
+                  : round($walkIn->created_at->diffInMinutes(now()) / 60, 1) . ' hours';
+              } else {
+              $durationDisplay = $walkIn->duration_minutes <= 60
+                ? round($walkIn->duration_minutes) . ' minutes'
+                : round($walkIn->duration_minutes / 60, 1) . ' hours';
+              }
               @endphp
             <td class="text-center px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                 {{ $durationDisplay }}
