@@ -8,6 +8,9 @@
 
   <p class="text-gray-500 mb-6 text-sm">Devices here have been flagged for possible deletion.</p>
 
+  <input type="checkbox" id="hideSurplus" class="mb-4" onChange="toggleSurplus()">
+  <label for="hideSurplus" class="text-sm text-gray-500 mb-6">Hide devices marked as surplus</label>
+
   <form method="POST" action="{{ route('admin.flagged_devices.bulk_destroy') }}" id="bulkForm">
     @csrf
     @method('DELETE')
@@ -33,7 +36,7 @@
         <tbody class="divide-y divide-gray-100">
           @foreach($devices as $device)
             @php $lastActivity = $device->activities->sortByDesc('created_at')->first(); @endphp
-            <tr class="bg-red-50">
+            <tr class="bg-red-50 {{ $lastActivity && $lastActivity->status->status_name === 'Surplus' ? 'surplus-row' : '' }}">
               <td class="px-4 py-3">
                 <input type="checkbox" name="device_ids[]" value="{{ $device->id }}"
                   class="row-checkbox rounded border-gray-300">
@@ -92,21 +95,37 @@
 
 </x-layout>
 <script>
+    const hideSurplus = document.getElementById('hideSurplus');
     const selectAll    = document.getElementById('selectAll');
     const checkboxes   = document.querySelectorAll('.row-checkbox');
     const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
     const selectedCount = document.getElementById('selectedCount');
 
     function updateButton() {
-        const checked = document.querySelectorAll('.row-checkbox:checked').length;
-        selectedCount.textContent = checked;
-        bulkDeleteBtn.disabled = checked === 0;
+      const checked = document.querySelectorAll('.row-checkbox:checked').length;
+      selectedCount.textContent = checked;
+      bulkDeleteBtn.disabled = checked === 0;
     }
 
     selectAll.addEventListener('change', function () {
-        checkboxes.forEach(cb => cb.checked = this.checked);
-        updateButton();
+      checkboxes.forEach(cb => {
+        const row = cb.closest('tr');
+        if (row.style.display !== 'none') {
+            cb.checked = this.checked;
+        }
+        });
+      updateButton();
     });
 
     checkboxes.forEach(cb => cb.addEventListener('change', updateButton));
+
+    function toggleSurplus() {
+      const hide = document.getElementById('hideSurplus').checked;
+      document.querySelectorAll('.surplus-row').forEach(row => {
+        row.style.display = hide ? 'none' : '';
+        if (hide) row.querySelector('.row-checkbox').checked = false;
+      });
+      updateButton();
+    }
+
 </script>
