@@ -310,7 +310,53 @@
       incomingStatusSelect.parentElement.classList.add('opacity-50');
     }
   }
+
   toggleIncomingStatus(); // Initialize on page load
+
+  // Sticky header logic.
+  const table = document.querySelector('table');
+  const thead = table.querySelector('thead');
+  const clone = thead.cloneNode(true);
+
+  // Style the floating clone
+  clone.style.cssText = `
+    position: fixed;
+    top: 0;
+    z-index: 50;
+    display: none;
+    background: #f9fafb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  `;
+
+  // Match the clone width to the real table
+  function syncWidth() {
+    clone.style.width = table.offsetWidth + 'px';
+    clone.style.left = table.getBoundingClientRect().left + 'px';
+
+    // Sync each column width
+    const realThs = thead.querySelectorAll('th');
+    const cloneThs = clone.querySelectorAll('th');
+    realThs.forEach((th, i) => {
+      cloneThs[i].style.width = th.offsetWidth + 'px';
+    });
+  }
+
+  document.body.appendChild(clone);
+
+  window.addEventListener('scroll', () => {
+    const theadBottom = thead.getBoundingClientRect().bottom;
+    if (theadBottom < 0) {
+      syncWidth();
+      clone.style.display = 'table-header-group';
+    } else {
+      clone.style.display = 'none';
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (clone.style.display !== 'none') syncWidth();
+  });
+
 </script>
 
 </x-layout>
