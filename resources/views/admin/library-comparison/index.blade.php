@@ -149,6 +149,11 @@
           @endif
       </div>
 
+      <div>
+        <input type="checkbox" id="hideMatches" class="rounded border-gray-300 mb-3" onChange="document.querySelectorAll('.match-row').forEach(row => row.style.display = this.checked ? 'none' : '')">
+        <label for="hideMatches" class="text-sm text-gray-700">Hide Matches
+      </div>
+
       <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           <table class="min-w-full text-sm divide-y divide-gray-200">
               <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wide">
@@ -170,7 +175,8 @@
                       @elseif($row['result_type'] === 'delete_flag') bg-red-50
                       @else bg-gray-50
                       @endif
-                  ">
+                      {{ $row['result_type'] === 'match' ? 'match-row' : '' }}
+                      ">
                       {{-- Identifier --}}
                       <td class="px-4 py-3 font-mono font-medium text-gray-800">
                           {{ $row['identifier'] }}
@@ -237,17 +243,19 @@
 
                           {{-- MISMATCH: update status --}}
                           @if($row['result_type'] === 'mismatch')
-                              <form method="POST" action="{{ route('admin.library_comparison.update-status') }}">
-                                  @csrf
-                                  <input type="hidden" name="device_id" value="{{ $row['device']->id }}">
-                                  <input type="hidden" name="status_id" value="{{ $row['mapped_status']->id }}">
-                                  <button type="submit"
-                                      class="inline-flex items-center gap-1 rounded-md bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
-                                      onclick="return confirm('Update {{ $row['device']->srjc_tag }} to {{ $row['mapped_status']->status_name }}?')">
-                                      Update Status
-                                  </button>
-                              </form>
-
+                          <div class="flex items-center gap-2">
+                            <form method="POST" action="{{ route('admin.library_comparison.update-status') }}">
+                                    @csrf
+                                    <input type="hidden" name="device_id" value="{{ $row['device']->id }}">
+                                    <input type="hidden" name="status_id" value="{{ $row['mapped_status']->id }}">
+                                    <button type="submit"
+                                        class="inline-flex items-center gap-1 rounded-md bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                                        onclick="return confirm('Update {{ $row['device']->srjc_tag }} to {{ $row['mapped_status']->status_name }}?')">
+                                        Update Status
+                                    </button>
+                                </form>
+                                <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Show all activity for this device" target="_blank" href="{{ route('search', ['srjc_tag' => $row['device']->srjc_tag, 'serial_number' => $row['device']->serial_number, 'status_id' => 'any', 'current_status_only' => 'off']) }}"><i class="fa-solid fa-magnifying-glass"></i></a>
+                          </div>
                           {{-- NOT FOUND: add device modal trigger --}}
                           @elseif($row['result_type'] === 'not_found')
                               @php
