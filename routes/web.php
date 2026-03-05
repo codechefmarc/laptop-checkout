@@ -18,6 +18,8 @@ use App\Http\Controllers\PoolController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\StatusController;
+use App\Http\Controllers\SupportCategoryController;
+use App\Http\Controllers\WalkInLogController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -73,6 +75,17 @@ Route::middleware(['auth', 'is.student'])->group(function () {
   });
 });
 
+// Walk In Log.
+Route::middleware(['auth', 'role:student,admin'])->group(function () {
+  Route::controller(WalkInLogController::class)->group(function () {
+    Route::get('/walk-in-log', 'walkInLog')->name('walk_in_log');
+    Route::post('/walk-in-log', 'storeWalkIn')->name('walk_in_log.store');
+    Route::get('/walk-in-log/edit/{walkIn}', 'edit')->name('walk_in_log.edit');
+    Route::patch('/walk-in-log/{walkIn}', 'patch')->name('walk_in_log.update');
+    Route::patch('/walk-in-log/complete/{walkIn}', 'complete')->name('walk_in_log.complete');
+  });
+});
+
 // Activities for admins and editors.
 Route::middleware(['auth', 'can.edit'])->group(function () {
   Route::controller(ActivityController::class)->group(function () {
@@ -99,6 +112,13 @@ Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->gro
 Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->group(function () {
   Route::resource('pool', PoolController::class);
   Route::post('pool/reorder', [PoolController::class, 'reorder'])->name('pool.reorder');
+});
+
+
+// Support Categories.
+Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->group(function () {
+  Route::resource('support_category', SupportCategoryController::class);
+  Route::post('support_category/reorder', [SupportCategoryController::class, 'reorder'])->name('support_category.reorder');
 });
 
 // Search.

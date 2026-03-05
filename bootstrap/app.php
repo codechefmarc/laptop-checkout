@@ -3,7 +3,7 @@
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\CanAccessActivitiesMiddleware;
 use App\Http\Middleware\CanEditMiddleware;
-use App\Http\Middleware\IsStudentMiddleware;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'admin' => AdminMiddleware::class,
         'can.edit' => CanEditMiddleware::class,
         'is.student' => CanAccessActivitiesMiddleware::class,
+        'role' => RoleMiddleware::class,
       ]);
   })
   ->withExceptions(function (Exceptions $exceptions): void {
