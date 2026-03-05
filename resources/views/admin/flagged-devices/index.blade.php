@@ -53,15 +53,18 @@
               </td>
               <td class="px-4 py-3 text-gray-500 text-xs">{{ $device->updated_at->format('m/d/Y') }}</td>
               <td class="px-4 py-3">
+              <div class="flex items-center space-x-2">
                 <form method="POST" action="{{ route('admin.flagged_devices.destroy', $device) }}">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit"
-                    class="inline-flex items-center rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
-                    onclick="return confirm('Permanently delete {{ $device->srjc_tag }} and all its activities?')">
-                    Delete
-                  </button>
-                </form>
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                      class="inline-flex items-center rounded-md bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-1.5 transition-colors"
+                      onclick="return confirm('Permanently delete {{ $device->srjc_tag }} and all its activities?')">
+                      Delete
+                    </button>
+                  </form>
+                  <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Show all activity for this device" target="_blank" href="{{ route('search', ['srjc_tag' => $device->srjc_tag, 'serial_number' => $device->serial_number, 'status_id' => 'any', 'current_status_only' => 'off']) }}"><i class="fa-solid fa-magnifying-glass"></i></a>
+              </div>
               </td>
             </tr>
           @endforeach
