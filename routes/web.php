@@ -57,6 +57,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::delete('/{device}', [FlaggedDeviceController::class, 'destroy'])->name('destroy');
   });
 
+  Route::prefix('reports')->name('reports.')->group(function () {
+    Route::get('/checkout-laptops', [ReportsController::class, 'checkoutLaptopReports'])->name('checkout_laptops');
+    Route::get('/walk-in-log', [ReportsController::class, 'walkInLog'])->name('walk_in_log');
+  });
+
 });
 
 // User profile - users can edit their own profile.
@@ -125,13 +130,6 @@ Route::middleware(['auth', 'admin'])->prefix('taxonomy')->name('taxonomy.')->gro
 Route::middleware(['auth'])->group(function () {
   Route::controller(SearchController::class)->group(function () {
     Route::get('/search', 'search')->name('search');
-  });
-});
-
-// Reports.
-Route::middleware(['auth'])->group(function () {
-  Route::controller(ReportsController::class)->group(function () {
-    Route::get('/reports', 'reports')->name('reports');
   });
 });
 

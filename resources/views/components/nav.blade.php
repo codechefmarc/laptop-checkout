@@ -18,7 +18,7 @@
       </summary>
       <div class="w-50 mt-2 shadow-lg rounded-md py-1 bg-gray-200 absolute right-[50%] transform-[translateX(50%)]">
         <x-nav-link href="{{ route('search') }}" :active="request()->routeIs('search')">Search</x-nav-link>
-        <x-nav-link href="{{ route('reports') }}" :active="request()->routeIs('reports')">Reports</x-nav-link>
+        <x-nav-link href="{{ route('admin.reports.checkout_laptops') }}" :active="request()->routeIs('admin.reports.checkout_laptops')">Reports</x-nav-link>
       </div>
     </details>
 
@@ -44,6 +44,9 @@
         </a>
         <a href="{{ route('taxonomy.pool.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Manage Pools
+        </a>
+        <a href="{{ route('admin.reports.walk_in_log') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
+          Walk-In Log Reports
         </a>
         <a href="{{ route('taxonomy.support_category.index') }}" class="block px-4 py-2 text-sm hover:bg-gray-300">
           Manage Support Categories

@@ -6,6 +6,8 @@ use App\Models\Activity;
 use App\Models\Device;
 use App\Models\Pool;
 use App\Models\Status;
+use App\Models\SupportCategory;
+use App\Models\WalkInLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -17,7 +19,7 @@ class ReportsController extends Controller {
   /**
    * Overall reports page.
    */
-  public function reports(Request $request) {
+  public function checkoutLaptopReports(Request $request) {
     $activities = NULL;
     $devices = NULL;
     $report_title = NULL;
@@ -267,6 +269,78 @@ class ReportsController extends Controller {
       ->values();
 
     return $modelCounts;
+  }
+
+  /**
+   * Walk-in log report.
+   */
+  public function walkInLog(Request $request) {
+    $categories = SupportCategory::orderBy('weight')->orderBy('name')->get();
+
+    $selectedCategory = $request->input('category_id');
+    $escalated = $request->input('escalated');
+    $dateRange = $request->input('date_range');
+
+    $startDate = NULL;
+    $endDate = NULL;
+
+    if ($dateRange) {
+      $parts = explode(' to ', $dateRange);
+      $startDate = $parts[0];
+      $endDate = $parts[1] ?? $parts[0];
+    }
+
+    $query = WalkInLog::query();
+
+    if ($startDate && $endDate) {
+      $query->whereBetween('created_at', [$startDate . ' 00:00:00', $endDate . ' 23:59:59']);
+    }
+
+    if ($escalated === '1') {
+      $query->where('escalated', TRUE);
+    }
+
+    // Total before category filter (for escalation percentage)
+    $totalCount = (clone $query)->count();
+    $totalEscalated = (clone $query)->where('escalated', TRUE)->count();
+
+    if ($selectedCategory) {
+      $categoryQuery = (clone $query)
+        ->whereHas('supportCategories', fn($q) => $q->where('support_categories.id', $selectedCategory));
+
+      $counts = collect([
+        [
+          'name'         => $categories->firstWhere('id', $selectedCategory)?->name,
+          'count'        => (clone $categoryQuery)->count(),
+          'avg_duration' => (clone $categoryQuery)->avg('duration_minutes'),
+        ],
+      ]);
+    }
+    else {
+      $counts = $categories->map(function ($category) use ($query) {
+        $categoryQuery = (clone $query)
+          ->whereHas('supportCategories', fn($q) => $q->where('support_categories.id', $category->id));
+
+        return [
+          'name'             => $category->name,
+          'count'            => (clone $categoryQuery)->count(),
+          'avg_duration'     => (clone $categoryQuery)->avg('duration_minutes'),
+        ];
+      })
+        ->filter(fn($row) => $row['count'] > 0)
+        ->sortByDesc('count')
+        ->values();
+    }
+
+    return view('reports.walk-in-report', [
+      'counts'           => $counts,
+      'totalCount'       => $totalCount,
+      'totalEscalated'   => $totalEscalated,
+      'categories'       => $categories,
+      'selectedCategory' => $selectedCategory,
+      'escalated'        => $escalated,
+      'dateRange'        => $dateRange,
+    ]);
   }
 
 }
