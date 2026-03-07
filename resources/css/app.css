@@ -11,3 +11,5 @@
 }
 
 @source inline("bg-{slate,gray,stone,red,orange,amber,yellow,green,teal,cyan,blue,indigo,violet,purple,pink,rose}-{500,600,700,800,900}");
+
+[x-cloak] { display: none !important; }

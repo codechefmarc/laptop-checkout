@@ -61,12 +61,12 @@
             </td>
             <td class="px-6 py-4 flex gap-1 justify-around">
             @auth
-              @if(!auth()->user()->isReadOnly())
+              @if(auth()->user()->can('laptops.edit'))
                   <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Edit activity" href="{{ route('activities.edit', $activity->id) }}"><i class="fa-solid fa-pen-to-square"></i></a>
                   </div>
               @endif
-              @if(auth()->user()->canEdit())
+              @if(auth()->user()->can('data-entry'))
                   <div class="text-center text-sm text-gray-900">
                     <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Edit device" href="{{ route('devices.edit', $activity->device->id) }}"><i class="fa-solid fa-laptop-file"></i></a>
                   </div>

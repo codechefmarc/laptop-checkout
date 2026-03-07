@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider {
    */
   public function boot(): void {
     Gate::define('edit-user', function ($currentUser, $targetUser) {
-        return $currentUser->isAdmin() || $currentUser->id === $targetUser->id;
+      return $currentUser->can('users.admin') || $currentUser->id === $targetUser->id;
     });
   }
 

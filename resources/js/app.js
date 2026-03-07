@@ -9,6 +9,13 @@ import "flatpickr/dist/flatpickr.css";
 import Sortable from 'sortablejs';
 window.Sortable = Sortable;
 
+// Alpine.
+import Alpine from 'alpinejs'
+
+window.Alpine = Alpine
+
+Alpine.start()
+
 const date_range = document.getElementById('date_range');
 if (date_range) {
   flatpickr(date_range, {

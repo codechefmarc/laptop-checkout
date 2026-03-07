@@ -3,7 +3,7 @@
 
 <div class="max-w-7xl mx-auto px-4 py-8">
 
-  <form method="GET" action="{{ route('admin.reports.walk_in_log') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+  <form method="GET" action="{{ route('reports.walk_in_log') }}" class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
     <div class="flex gap-6 items-end flex-wrap">
 
       {{-- Date Range --}}

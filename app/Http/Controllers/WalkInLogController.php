@@ -37,7 +37,7 @@ class WalkInLogController extends Controller {
    */
   public function storeWalkIn(Request $request) {
     $validated = $request->validate([
-      'description' => 'required|string',
+      'description' => 'nullable|string',
       'support_category_id' => [
         ['required', 'array', 'min:1'],
       ],
@@ -55,7 +55,7 @@ class WalkInLogController extends Controller {
       'duration_minutes' => $validated['duration_minutes'] ?? NULL,
     ])->supportCategories()->attach($validated['support_category_id']);
 
-    return redirect()->route('walk_in_log')->with('success', 'Walk in successfully logged.');
+    return redirect()->route('walk_in_log.index')->with('success', 'Walk in successfully logged.');
   }
 
   /**
@@ -75,7 +75,7 @@ class WalkInLogController extends Controller {
    */
   public function patch(Request $request, WalkInLog $walkIn) {
     $validated = $request->validate([
-      'description' => 'required|string',
+      'description' => 'nullable|string',
       'support_category_id' => [
         ['required', 'array', 'min:1'],
       ],
@@ -93,7 +93,7 @@ class WalkInLogController extends Controller {
     ]);
     $walkIn->supportCategories()->sync($validated['support_category_id']);
 
-    return redirect()->route('walk_in_log')->with('success', 'Walk in log entry successfully updated.');
+    return redirect()->route('walk_in_log.index')->with('success', 'Walk in log entry successfully updated.');
   }
 
   /**
@@ -104,7 +104,7 @@ class WalkInLogController extends Controller {
       'duration_minutes' => $walkIn->created_at->diffInMinutes(now()),
     ]);
 
-    return redirect()->route('walk_in_log')->with('success', 'Walk in completed.');
+    return redirect()->route('walk_in_log.index')->with('success', 'Walk in completed.');
   }
 
 }

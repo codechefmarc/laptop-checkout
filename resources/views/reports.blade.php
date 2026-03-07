@@ -12,13 +12,13 @@
       <li><a class="text-blue-500" href="?report=inactive_devices">Devices Without Activities</a> ({{ $inactive_device_count }})</li>
       <li>
         @auth
-          @if(auth()->user()->isAdmin())
+          @if(auth()->user()->can('laptops.admin'))
             <a class="text-blue-500" href="{{ route('admin.flagged_devices.index') }}">
           @endif
         @endauth
         Flagged for Review / Deletion
         @auth
-          @if(auth()->user()->isAdmin())
+          @if(auth()->user()->can('laptops.admin'))
             </a>
           @endif
         @endauth

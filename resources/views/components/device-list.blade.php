@@ -24,7 +24,7 @@
             Date Updated
           </th>
           @auth
-            @if(auth()->user()->canEdit())
+            @if(auth()->user()->can('data-entry'))
               <th class="text-center px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Operations
               </th>
@@ -57,7 +57,7 @@
               <div class="text-xs text-gray-500">{{ $device->updated_at->format('g:iA') }}</div>
             </td>
             @auth
-              @if(auth()->user()->canEdit())
+              @if(auth()->user()->can('data-entry'))
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900 text-center">
                     <a class="text-blue-500 text-lg font-semibold hover:text-gray-800" title="Edit device" href="{{ route('devices.edit', $device->id) }}"><i class="fa-solid fa-laptop-file"></i></a>

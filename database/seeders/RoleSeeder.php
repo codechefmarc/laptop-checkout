@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 /**
  * Seeds the database with roles.
@@ -11,26 +12,27 @@ use Illuminate\Database\Seeder;
 class RoleSeeder extends Seeder {
 
   /**
-   * Seeds the database with default roles.
+   * Run the database seeds.
    */
   public function run() {
-    Role::create([
-      'name' => 'admin',
-      'display_name' => 'Administrator',
-      'description' => 'Full access to all features including user management',
-    ]);
+    foreach (config('permissions') as $permission) {
+      Permission::firstOrCreate(['name' => $permission]);
+    }
 
-    Role::create([
-      'name' => 'data_entry',
-      'display_name' => 'Data Entry',
-      'description' => 'Can create and edit data but cannot manage users',
-    ]);
+    $admin = Role::create(['name' => 'admin', 'display_name' => 'Administrator']);
+    $admin->givePermissionTo(Permission::all());
 
-    Role::create([
-      'name' => 'read_only',
-      'display_name' => 'Read Only',
-      'description' => 'Can only view data, no editing permissions',
-    ]);
+    $itStaff = Role::create(['name' => 'it_staff', 'display_name' => 'IT Staff']);
+    $itStaff->givePermissionTo(['laptops.edit', 'laptops.reports']);
+
+    $laptopReporting = Role::create(['name' => 'read_only_laptop', 'display_name' => 'Laptop Reporting']);
+    $laptopReporting->givePermissionTo(['laptops.reports']);
+
+    $supportReporting = Role::create(['name' => 'read_only_support', 'display_name' => 'Support Reporting']);
+    $supportReporting->givePermissionTo(['walkin.reports']);
+
+    $student = Role::create(['name' => 'student', 'display_name' => 'Student']);
+    $student->givePermissionTo(['laptops.edit', 'laptops.reports', 'walkin.edit']);
   }
 
 }
