@@ -11,6 +11,7 @@ use App\Http\Controllers\Checkouts\FlaggedDeviceController;
 use App\Http\Controllers\Checkouts\LibraryComparisonController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Taxonomy\ComputerModelController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')->prefix('checkouts')->name('checkouts.')->group(function () {
@@ -64,7 +65,7 @@ Route::middleware('auth')->prefix('checkouts')->name('checkouts.')->group(functi
 });
 
 // Computer model API routes (used by TomSelect autocomplete and inline modal).
-Route::middleware('auth')->prefix('api/computer-models')->name('api.computer-models.')->controller(\App\Http\Controllers\Taxonomy\ComputerModelController::class)->group(function () {
+Route::middleware('auth')->prefix('api/computer-models')->name('api.computer-models.')->controller(ComputerModelController::class)->group(function () {
   Route::get('/search', 'search')->name('search');
   Route::post('/', 'apiStore')->name('store');
 });

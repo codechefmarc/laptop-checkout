@@ -77,7 +77,7 @@ async function saveModelModal() {
   }
 
   try {
-    const response = await fetch('/api/computer-models', {
+    const response = await fetch(window.apiRouteStore, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
